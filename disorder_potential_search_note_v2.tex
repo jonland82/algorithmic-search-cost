@@ -1,0 +1,428 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[margin=0.76in,top=0.70in,bottom=0.70in,headsep=10pt,footskip=22pt]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{microtype,booktabs,array,titlesec,fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4.5pt}
+\linespread{1.035}
+\setlength{\abovedisplayskip}{7pt}
+\setlength{\belowdisplayskip}{7pt}
+\setlength{\abovedisplayshortskip}{4pt}
+\setlength{\belowdisplayshortskip}{4pt}
+\titleformat{\section}{\large\bfseries}{\thesection}{0.65em}{}[\vspace{2pt}\titlerule]
+\titlespacing*{\section}{0pt}{11pt}{6pt}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\cost}{\operatorname{cost}}
+\newcommand{\Cconc}{\mathcal C_{\mathrm{conc}}}
+\newcommand{\Cspread}{\mathcal C_{\mathrm{spread}}}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small Disorder Potential and the Cost of Search}
+\fancyhead[R]{\small J. R. Landers}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\setlength{\headheight}{13pt}
+\hypersetup{pdftitle={Disorder Potential and the Cost of Search (Version 2)},pdfauthor={Jonathan R. Landers}}
+
+\begin{document}
+\thispagestyle{plain}
+\begin{center}
+{\LARGE\bfseries Disorder Potential and the Cost of Search}\par
+\vspace{4pt}
+{\large A balance law and a separation by disorder location}\par
+\vspace{6pt}
+Jonathan R. Landers\par
+\small October 4, 2026
+\end{center}
+\vspace{-3pt}
+\textbf{Abstract.} Sorting creates structure that makes subsequent search cheaper. We study
+this connection using the squared rank-displacement potential from the permutohedral
+view of sorting. Given a potential budget $E$, the optimal worst-case comparison-search
+cost is $\Theta(\log n+\min\{n,\sqrt E\})$. A matching lower bound explains the square root:
+a target can hide among $r$ positions while using only $\Theta(r^2)$ potential. We then
+construct two promised input families with identical maximum potential but different
+optimal search costs. A potential balance accounts exactly for disorder removed;
+the arrangement of the remaining disorder determines whether search can improve on
+the guarantee obtained from the scalar budget alone.
+
+\textbf{Historical orientation.} The argument below joins three older questions. Rank
+statistics and the geometry of permutations ask how to measure distance from order.
+Classical comparison algorithms ask how ordering permits logarithmic search and what
+information sorting comparisons must uncover. Adaptive algorithms ask what can be
+done when some order is already present. We follow these threads through the
+potential-based search bound, then return to their common limitation: a single
+number records the magnitude of disorder but not where it lies.
+
+\section{From preprocessing to usable structure}
+An unordered array can require $n$ comparisons to search. Once sorted, it supports
+binary search in $\Theta(\log n)$ comparisons. Producing that order by comparison sorting
+requires $\Theta(n\log n)$ comparisons in the unrestricted worst case. These bounds suggest
+an accounting question: how does the structure created during preprocessing translate
+into the work saved afterward?
+
+Actual effort cannot itself be the conserved quantity. Two sorting procedures can spend
+very different amounts of work and produce the same array. Existing order also matters:
+an almost-sorted input may need little additional rearrangement. We therefore account for
+\emph{remaining disorder}, rather than identify all work spent with useful progress.
+The potential in Landers~\cite{landers} supplies a geometric measure. Our aim is to connect
+that measure to search complexity, then determine what its scalar value leaves out.
+
+\paragraph{The classical gap between sorting and searching.}
+Knuth's treatment of sorting and searching~\cite{knuth} places the two endpoints
+of this question in a common algorithmic setting: without order, a search may need
+to examine every entry; with total order, binary search discards a constant fraction
+of the remaining possibilities at each comparison. The familiar comparison-sorting
+lower bound counts the possible input orders. Fredman's treatment of sorting under
+prior information~\cite{fredman} makes the next historical step: a promise narrows
+the set of possible orders, so the complexity depends on what the algorithm is
+told before making comparisons. Here the promise is deliberately sparse---one
+bound on residual disorder---and the question is how much search power it carries.
+
+\section{Model and geometric potential}
+Let $A=(a_1,\ldots,a_n)$ contain $n\geq2$ distinct keys from an arbitrary totally ordered
+universe. Put $x_i=\rank_A(a_i)$ and $v_s=(1,\ldots,n)$. The rank word $x$ is a vertex of
+the permutohedron $\operatorname{conv}\{\pi(v_s):\pi\in S_n\}$. Define
+\begin{equation}
+ V(A)=\frac12\|x-v_s\|_2^2=\frac12\sum_{i=1}^n(x_i-i)^2,
+ \qquad d(A)=\max_i|x_i-i|. \label{eq:potential}
+\end{equation}
+Thus $V$ measures squared Euclidean distance to the sorted vertex; it is not the
+adjacent-swap graph distance. The ranks are an analytical description, not an oracle
+available to the search algorithm.
+
+\begin{samepage}
+\paragraph{The statistical and geometric ancestry of $V$.}
+Spearman's early work on rank correlation~\cite{spearman} made differences between
+rankings into a quantitative object. For distinct ranks, the usual Spearman
+coefficient relative to sorted order is
+\begin{equation}
+ \rho_s=1-\frac{6\sum_i(x_i-i)^2}{n(n^2-1)}
+       =1-\frac{12V(A)}{n(n^2-1)}. \label{eq:spearman}
+\end{equation}
+\end{samepage}
+Thus the potential used here is an unnormalized quadratic rank difference. It
+should be distinguished from Spearman's \emph{footrule}, the sum of absolute
+rank differences, and from Kendall's discordant-pair measure~\cite{kendall}.
+Diaconis and Graham~\cite{diaconis} related footrule distance to inversion
+distance, illustrating both the usefulness and the nonidentity of these notions
+of disarray. Mannila's theory of presortedness~\cite{mannila} subsequently made
+the choice of disorder measure part of algorithm design: different measures
+support different adaptive guarantees. This note chooses the quadratic measure
+because it connects Landers's sorting potential to a sharp search guarantee.
+
+The rank word also has a geometric home. Rado's work on convex hulls of
+permutations~\cite{rado} underlies the permutohedral viewpoint: the $n!$ possible
+rank words are vertices of one polytope. Landers's work, first posted in 2025
+and revised in 2026~\cite{landers}, uses that picture
+to distinguish motion along adjacent-swap edges from an ambient gradient flow
+and from comparisons that eliminate feasible orders. The search algorithm below
+does not traverse the polytope; it uses a numerical consequence of distance to
+one distinguished vertex.
+
+A deterministic search algorithm queries indices $i$, receiving the outcome of
+$y<a_i$, $y=a_i$, or $y>a_i$. It must return the index of $y$, or report absence.
+There is no auxiliary index or preprocessing transcript. A numerical promise $V(A)\leq E$
+is supplied; obtaining that promise is a separate preprocessing cost. With $C_S(A,y;E)$
+denoting the number of queries, define
+\begin{equation}
+ Q^*(n,E)=\inf_{S\ \mathrm{correct}}\ \sup_{A:\,V(A)\leq E}\ \sup_y C_S(A,y;E).
+ \label{eq:minimax}
+\end{equation}
+All logarithms in complexity expressions are base $2$; constants are independent of $n,E$.
+
+The promise in~\eqref{eq:minimax} should be read in Fredman's informational
+spirit~\cite{fredman}: it is knowledge supplied to the algorithm, not a free
+ability to inspect ranks. In particular, the absence of an auxiliary index or
+preprocessing transcript prevents the searcher from using location information
+that may have been available while the array was prepared.
+
+\section{How potential limits displacement}
+\begin{lemma}\label{lem:displacement}
+For every rank word, $V(A)\geq d(A)(d(A)+1)/2$. Consequently, if $V(A)\leq E$, then
+\begin{equation}
+ d(A)\leq D_E:=\min\left\{n-1,\left\lfloor\frac{\sqrt{1+8E}-1}{2}\right\rfloor\right\}.
+ \label{eq:DE}
+\end{equation}
+\end{lemma}
+\begin{proof}
+Set $\delta_i=x_i-i$ and select $j$ with $|\delta_j|=d$. Since $\sum_i\delta_i=0$,
+$\sum_{i\ne j}|\delta_i|\geq d$. Integer displacements satisfy $\delta_i^2\geq|\delta_i|$,
+so $2V=d^2+\sum_{i\ne j}\delta_i^2\geq d^2+d$. Solving this inequality gives~\eqref{eq:DE}.
+\end{proof}
+
+\paragraph{A bridge between global and local disorder.}
+The lemma converts a global, quadratic budget into a bound on the worst
+individual displacement. Its proof needs more than the trivial observation
+$V\geq d^2/2$: since a rank word is a permutation, a displacement of size $d$
+must be balanced by at least $d$ units of displacement elsewhere. The resulting
+$d(d+1)/2$ is attained when one element moves past $d$ neighbors. This
+extremal pattern will reappear in the search lower bound, linking the geometry
+of the potential to the information available from index queries.
+
+\newpage
+\section{A tight search bound from potential alone}
+The direct algorithmic predecessor is the study of search in nearly sorted
+arrays. Disser and Kratsch~\cite{disser} analyze, among other measures, maximum
+displacement from sorted position. Their work shows why a binary-search-like
+phase can remain useful when each item is known to lie near its true rank, and
+why a residual local scan is necessary. Lemma~\ref{lem:displacement} translates
+the present potential promise into precisely that kind of displacement
+certificate. The theorem then states the minimax consequence for this note's
+model, including absent targets and a promise expressed only as $V\leq E$.
+
+\begin{theorem}\label{thm:sharp}
+For $n\geq2$ and $E\geq0$, the model in Section~2 satisfies
+\begin{equation}
+ \boxed{Q^*(n,E)=\Theta\!\left(\log n+\min\{n,\sqrt E\}\right).}
+ \label{eq:sharp}
+\end{equation}
+\end{theorem}
+\begin{proof}
+\textbf{Upper bound.} Suppose first that $d(A)\leq D$ is known. Maintain an interval
+$[L,H]$ that contains the target whenever it is present. If its length exceeds
+$8D+4$, query $m=\lfloor(L+H)/2\rfloor$. Return $m$ on equality. Otherwise update
+\begin{equation}
+\begin{aligned}
+ a_m<y &: \quad L\leftarrow\max\{L,m-2D+1\},\\
+ a_m>y &: \quad H\leftarrow\min\{H,m+2D-1\}.
+\end{aligned} \label{eq:updates}
+\end{equation}
+Once the interval has length at most $8D+4$, scan it and return the target's index,
+or report absence.
+
+To prove the updates safe, suppose $y=a_p$ and let $r=x_p$ be its rank.
+If $a_m<y$, then
+\begin{equation}
+ p\geq r-D\geq x_m+1-D\geq m-2D+1.
+ \label{eq:saferight}
+\end{equation}
+If $a_m>y$, similarly $p\leq r+D\leq x_m-1+D\leq m+2D-1$.
+Thus the target is never discarded. If absent, no equality is returned, and the final
+scan correctly reports absence.
+
+For interval length $N$, either update leaves at most
+$\lfloor N/2\rfloor+2D$ candidates. When $N>8D+4$, this is less than $3N/4$.
+There are therefore $O(\log n)$ midpoint queries, followed by
+$O(\min\{n,D+1\})$ scan queries. Taking $D=D_E\leq\sqrt{2E}$ proves the upper
+bound in~\eqref{eq:sharp}. This is a direct potential-based formulation of
+bounded-displacement search~\cite{disser}.
+
+\textbf{Lower bound.} Fix ordered keys $a_1<\cdots<a_n$ and a target $y<a_1$.
+Let $A^{(0)}=(a_1,\ldots,a_n)$, in which $y$ is absent. For each $j$, let $A^{(j)}$
+be the same array with entry $j$ replaced by $y$. Its rank word is
+\begin{equation}
+ x^{(j)}=(2,3,\ldots,j,\,1,\,j+1,\ldots,n),
+ \qquad V(A^{(j)})=\frac{j(j-1)}2. \label{eq:hidden}
+\end{equation}
+For $j=1$ the first segment is empty and the rank word is the identity. Set
+\begin{equation}
+ r_E=\min\left\{n,\left\lfloor\frac{1+\sqrt{1+8E}}2\right\rfloor\right\}=D_E+1.
+ \label{eq:rE}
+\end{equation}
+All $A^{(j)}$ with $1\leq j\leq r_E$ satisfy $V\leq E$. On $A^{(0)}$, a correct
+algorithm must query every one of these positions. Otherwise an unqueried $j$ gives
+the same entire transcript on $A^{(j)}$, yet requires a different answer. Hence at
+least $r_E$ queries are necessary, and $r_E=\Theta(1+\min\{n,\sqrt E\})$.
+
+Independently, sorted arrays belong to the promised class. For a fixed sorted array,
+the search decision tree must distinguish $n$ matching indices and absence. Each query
+has at most three outcomes, so its worst-case depth is at least
+$\log_3(n+1)=\Omega(\log n)$. The larger of the two lower bounds is at least half
+their sum. This proves~\eqref{eq:sharp}.
+\end{proof}
+
+\textbf{Why a square root appears.} In~\eqref{eq:hidden}, the minimum moves $j-1$ positions,
+while the $j-1$ preceding entries each shift by one. Its large displacement contributes
+$(j-1)^2/2$ to the potential, and the smaller shifts contribute $(j-1)/2$.
+Thus $\Theta(r^2)$ potential permits a target to hide among $r$ candidate positions.
+The square root is a geometric obstruction to search, not an assumption about a
+particular sorting algorithm.
+
+\paragraph{What the lower bound says historically.}
+The sorted-array term $\Omega(\log n)$ is the familiar decision-tree obstruction
+from classical searching~\cite{knuth}. The new obstruction is positional: on
+the absent instance $A^{(0)}$, every one of the first $r_E$ indices must be
+checked because any unqueried index could hold the minimum in another
+promised instance. This is why counting possible rank words alone is not a
+substitute for the adversary argument. The quadratic cost of hiding one key
+turns the global rank statistic into a $\sqrt E$ query penalty.
+
+\newpage
+\section{Equal potential budgets, different searchable structure}
+Theorem~\ref{thm:sharp} is tight when only $E$ is supplied. A more descriptive promise
+can permit substantially faster search. The following separation makes that distinction
+explicit; it compares maxima over families, not equal-potential individual inputs.
+
+This distinction echoes the presortedness literature~\cite{mannila,diaconis}:
+two measures can assign similar numerical ``amounts of disorder'' while
+supporting different algorithms. Here even the \emph{same} measure and the
+\emph{same} maximum budget lead to different search costs when the known
+families constrain where displacement can occur. One family concentrates
+potential in a single long move; the other disperses it over many short moves.
+
+\begin{proposition}\label{prop:location}
+Let $r\geq2$, $E=r(r-1)/2$, and $n\geq2E$. There are two known families of
+length-$n$ arrays with maximum potential exactly $E$, whose optimal worst-case
+search costs are respectively $\Theta(\log n+r)$ and $\Theta(\log n)$.
+\end{proposition}
+\begin{proof}
+Define $\Cconc$ by taking an arbitrary sorted array, removing its minimum, and inserting
+it at a position $j\in\{1,\ldots,r\}$. Its rank words are precisely those
+in~\eqref{eq:hidden}, so its maximum potential is $E$. Search by scanning the first $r$
+entries, then binary-searching the sorted suffix if necessary. This uses
+$O(r+\log n)$ queries. Every array used in the hiding argument belongs to $\Cconc$,
+including $A^{(0)}$. That argument supplies $\Omega(r)$, and the sorted subfamily
+supplies $\Omega(\log n)$, proving the matching bound.
+
+Define $\Cspread$ by taking an arbitrary sorted array and independently swapping any
+subset of the $E$ fixed pairs $(1,2),(3,4),\ldots,(2E-1,2E)$. Each swapped pair
+contributes $(1^2+(-1)^2)/2=1$ to $V$. Swapping every pair gives $V=E$, but every
+array has $d\leq1$. The search procedure~\eqref{eq:updates} with $D=1$ uses
+$O(\log n)$ queries. The sorted subfamily gives the matching lower bound.
+\end{proof}
+
+\begin{center}
+\renewcommand{\arraystretch}{1.18}
+\begin{tabular}{@{}p{3.6in}cc@{}}
+\toprule
+\textbf{Known arrangement of disorder}&\textbf{Maximum $V$}&\textbf{Optimal search}\\
+\midrule
+One minimum moved within a prefix of length $r$&$E$&$\Theta(\log n+\sqrt E)$\\
+Many independent adjacent-pair swaps&$E$&$\Theta(\log n)$\\
+\bottomrule
+\end{tabular}
+\end{center}
+For $n=2E=r(r-1)$ and $r\to\infty$, these costs become $\Theta(\sqrt E)$ and
+$\Theta(\log E)$. The same total potential can describe one deeply displaced item or
+many shallow displacements. The family promise tells search which geometry is possible;
+the scalar budget alone does not.
+
+Recent work offers nearby, but distinct, ways to provide richer information.
+Bai and Coester~\cite{bai} study sorting with possibly erroneous positional
+predictions. Narasimhan, Radhakrishnan, and Subramanian~\cite{narasimhan}
+study searches on approximately sorted arrays under disorder metrics including
+maximum displacement. Those settings emphasize the quality and form of the
+side information; Proposition~\ref{prop:location} isolates the value of a
+\emph{family-level location promise} even when its maximum potential is fixed.
+
+\section{The balance law and its computational meaning}
+Potential accounting became a standard way to analyze sequences of operations
+in data structures; for example, Sleator and Tarjan use it to study
+self-adjusting search trees~\cite{sleator}. The relevant lesson is that a
+change in potential can account for progress across operations, provided the
+relation between that change and actual operation cost is established. Here
+the potential has a geometric origin in Landers's permutohedral model
+\cite{landers}. The balance identity is exact, while any conversion of it to
+a running-time statement needs an explicit preprocessing algorithm and cost
+model.
+
+For a preprocessing trajectory $x^{(0)},\ldots,x^{(B)}$, let
+$\Delta_k=V(x^{(k)})-V(x^{(k+1)})$ and $A_B=\sum_{k=0}^{B-1}\Delta_k$. Telescoping gives
+\begin{equation}
+ \boxed{V(x^{(0)})=A_B+V(x^{(B)}).} \label{eq:balance}
+\end{equation}
+For inversion-removing adjacent swaps, $\Delta_k>0$; swapping adjacent ranks $a>b$
+gives $\Delta_k=a-b$~\cite{landers}. In the continuous relaxation
+$\dot x=-\nabla V$, differentiation gives $\dot V=-\|\nabla V\|_2^2$, and integration yields
+\begin{equation}
+ V(x(0))=V(x(t))+\int_0^t\|\nabla V(x(s))\|_2^2\,ds.
+ \label{eq:flow}
+\end{equation}
+Kendall's inversion distance counts each inversion-removing adjacent swap as
+one step, whereas the decrease in $V$ for such a swap is the rank gap $a-b$.
+The potential therefore records more than the number of local repairs: it
+also reflects how far the exchanged ranks lie apart. This is the same
+distinction that makes a deeply displaced item costly in
+Theorem~\ref{thm:sharp}.
+Thus initial disorder equals residual disorder plus accumulated decrease. If
+$V(x^{(0)})\leq E_0$ and preprocessing certifies a decrease of at least $a$, then
+$V(x^{(B)})\leq E_0-a$. Theorem~\ref{thm:sharp} gives the tight guarantee from
+this numerical promise alone, with $E=E_0-a$. Proposition~\ref{prop:location} shows
+why additional location information can improve it.
+
+This is an exact \emph{potential balance} and a sharp \emph{search guarantee}, not an
+equality between elapsed computation and savings. $B$ counts trajectory steps, not
+all comparisons needed to choose or certify them. With preprocessing cost $C_P$ and
+$q$ subsequent searches, total cost is $C_P+\sum_{j=1}^q C_S(A',y_j)$.
+The further question is how cheaply preprocessing can produce both low residual
+potential and useful structural certificates. The note connects established adaptive
+search machinery~\cite{disser} to the geometric potential; it makes no claim of priority.
+
+\section{The contemporary frontier: from a quantity to a certificate}
+Two strands of 2026 work sharpen the surrounding questions without answering
+the search problem studied here. Ansari and Rockel~\cite{ansari} investigate the
+attainable relation between Spearman's footrule and quadratic rank difference,
+including improved inequalities for finite rankings. Their results concern
+relations among \emph{measurements} of disorder. The present search theorem asks
+what one such measurement, given as a worst-case promise, allows an algorithm
+to infer about the location of a queried key.
+
+Rutschmann~\cite{rutschmann} studies a different information model: sorting
+when a partial order is already known. There, the preprocessing input explicitly
+records pairwise order constraints, and the number of compatible linear orders
+governs the remaining sorting problem. That line, from Fredman~\cite{fredman}
+to the 2026 result, makes the cost of preparing and using structural knowledge
+central. In the present setting, a certificate such as a bound on maximum
+displacement, or a promise of locally confined swaps, likewise has value beyond
+the scalar potential budget. Determining the least preprocessing cost needed to
+produce such a certificate is the natural next question suggested by the
+balance law and the separation in Proposition~\ref{prop:location}.
+
+\vspace{-2pt}
+\begin{thebibliography}{99}
+\setlength{\itemsep}{0pt}
+\setlength{\parskip}{0pt}
+\small
+\raggedright
+\bibitem{spearman} C. Spearman. The proof and measurement of association between two
+things. \emph{American Journal of Psychology} 15(1):72--101, 1904.
+\href{https://doi.org/10.2307/1412159}{doi:10.2307/1412159}.
+\bibitem{kendall} M. G. Kendall. A new measure of rank correlation.
+\emph{Biometrika} 30(1--2):81--93, 1938.
+\href{https://doi.org/10.1093/biomet/30.1-2.81}{doi:10.1093/biomet/30.1-2.81}.
+\bibitem{rado} R. Rado. An inequality. \emph{Journal of the London Mathematical
+Society} s1-27(1):1--6, 1952.
+\href{https://doi.org/10.1112/jlms/s1-27.1.1}{doi:10.1112/jlms/s1-27.1.1}.
+\bibitem{knuth} D. E. Knuth. \emph{The Art of Computer Programming, Volume 3:
+Sorting and Searching}. Addison-Wesley, 1973; 2nd ed., 1998.
+\href{https://cs.stanford.edu/~knuth/taocp.html}{Author's publication page}.
+\bibitem{fredman} M. L. Fredman. How good is the information theory bound in
+sorting? \emph{Theoretical Computer Science} 1(4):355--361, 1976.
+\href{https://doi.org/10.1016/0304-3975(76)90078-5}{doi:10.1016/0304-3975(76)90078-5}.
+\bibitem{diaconis} P. Diaconis and R. L. Graham. Spearman's footrule as a
+measure of disarray. \emph{Journal of the Royal Statistical Society, Series B}
+39(2):262--268, 1977.
+\href{https://doi.org/10.1111/j.2517-6161.1977.tb01624.x}{doi:10.1111/j.2517-6161.1977.tb01624.x}.
+\bibitem{mannila} H. Mannila. Measures of presortedness and optimal sorting
+algorithms. \emph{IEEE Transactions on Computers} C-34(4):318--325, 1985.
+\href{https://doi.org/10.1109/TC.1985.5009382}{doi:10.1109/TC.1985.5009382}.
+\bibitem{sleator} D. D. Sleator and R. E. Tarjan. Self-adjusting binary search
+trees. \emph{Journal of the ACM} 32(3):652--686, 1985.
+\href{https://doi.org/10.1145/3828.3835}{doi:10.1145/3828.3835}.
+\bibitem{disser} Y. Disser and S. Kratsch. \emph{Robust and Adaptive Search}.
+STACS 2017, LIPIcs 66, 26:1--26:14.
+\href{https://doi.org/10.4230/LIPIcs.STACS.2017.26}{doi:10.4230/LIPIcs.STACS.2017.26}.
+\bibitem{bai} X. Bai and C. Coester. Sorting with predictions.
+\emph{Advances in Neural Information Processing Systems} 36, 2023.
+\href{https://papers.neurips.cc/paper_files/paper/2023/hash/544696ef4847c903376ed6ec58f3a703-Abstract-Conference.html}{Proceedings page}.
+\bibitem{narasimhan} A. Narasimhan, S. Radhakrishnan, and C. R. Subramanian.
+On searching an approximately sorted array. Preprint, 2024.
+\href{https://doi.org/10.21203/rs.3.rs-4577262/v1}{doi:10.21203/rs.3.rs-4577262/v1}.
+\bibitem{landers} J. R. Landers. \emph{Sorting as Gradient Flow on the Permutohedron}.
+\href{https://arxiv.org/abs/2504.16706v2}{arXiv:2504.16706v2}, 2026.
+\bibitem{rutschmann} D. Rutschmann. Sorting under partial information with
+optimal preprocessing time via unified bound heaps.
+\href{https://arxiv.org/abs/2604.12653}{arXiv:2604.12653}, 2026.
+\bibitem{ansari} J. Ansari and M. Rockel. The exact Spearman rho-footrule
+region via optimal transport with applications to finite rankings, mixability,
+and Chatterjee's rank correlation.
+\href{https://arxiv.org/abs/2608.20176}{arXiv:2608.20176}, 2026.
+\end{thebibliography}
+\end{document}
