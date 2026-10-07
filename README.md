@@ -4,10 +4,10 @@
 
 [Read the website](https://jonland82.github.io/algorithmic-search-cost/) · [Browse the repository](https://github.com/jonland82/algorithmic-search-cost)
 
-Two notes study how an array's disorder affects comparison search. The shared measure is squared rank displacement,
+Two notes study how an array's disorder affects comparison search. Let $x_i$ be the rank of the entry at position $i$. Their shared measure is
 
 $$
-V(A)=\frac12\sum_{i=1}^{n}\bigl(\operatorname{rank}_A(a_i)-i\bigr)^2.
+V(A)=\frac{1}{2}\sum_{i=1}^{n}(x_i-i)^2.
 $$
 
 ## Papers
