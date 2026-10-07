@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#080808">
+  <meta name="description" content="Two notes on disorder potential, comparison search, and the value of preprocessing.">
+  <title>disorder / search — jonathan r. landers</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --paper: #080808;
+      --ink: #f2f0eb;
+      --muted: #b8b6b1;
+      --rule: #55534f;
+      --edge: clamp(12px, 2.6vw, 36px);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px/1.65 "Courier New", Courier, monospace;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: .28em; }
+    a:hover { color: #fff; }
+    a:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
+    ::selection { background: var(--ink); color: var(--paper); }
+    .skip {
+      position: absolute;
+      top: -5rem;
+      left: 1rem;
+      z-index: 2;
+      padding: .45rem .7rem;
+      background: var(--ink);
+      color: var(--paper);
+    }
+    .skip:focus { top: 1rem; }
+    .frame {
+      width: calc(100% - 2 * var(--edge));
+      max-width: 1440px;
+      min-height: 100svh;
+      margin-inline: auto;
+      padding-inline: clamp(18px, 3.4vw, 52px);
+      border-inline: 1px solid var(--rule);
+    }
+    .masthead, .section-line, .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 1.5rem;
+    }
+    .masthead {
+      padding-block: 1.65rem;
+      border-bottom: 1px solid var(--rule);
+    }
+    .brand { font-weight: 700; text-decoration: none; letter-spacing: -.025em; }
+    .masthead nav { display: flex; gap: clamp(1rem, 3vw, 2.4rem); }
+    .masthead nav a { text-decoration: none; border-bottom: 1px solid transparent; }
+    .masthead nav a:hover, .masthead nav a:focus-visible { border-bottom-color: currentColor; }
+    main { padding-bottom: 5rem; }
+    .intro { padding-block: clamp(3.6rem, 8vw, 7rem) clamp(3.5rem, 6vw, 6rem); }
+    .eyebrow, .kicker, .small-label { color: var(--muted); font-size: .84rem; }
+    .eyebrow { margin: 0 0 1.3rem; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 16ch;
+      margin-bottom: 1.6rem;
+      font-size: clamp(2.45rem, 6.6vw, 6.6rem);
+      font-weight: 400;
+      line-height: 1.04;
+      letter-spacing: -.075em;
+    }
+    .lead { max-width: 66ch; color: var(--muted); font-size: clamp(1rem, 1.55vw, 1.13rem); }
+    .measure {
+      display: grid;
+      grid-template-columns: minmax(8rem, 1fr) minmax(0, 2fr);
+      gap: 1.5rem;
+      align-items: center;
+      max-width: 900px;
+      margin-top: 3.2rem;
+      padding-block: 1.25rem;
+      border-block: 1px solid var(--rule);
+    }
+    .measure p { margin: 0; }
+    .equation { min-width: 0; overflow-x: auto; overflow-y: hidden; padding-block: .35rem; }
+    .equation mjx-container[display="true"] { margin: 0 !important; }
+    .section-line { padding-block: 1rem; border-block: 1px solid var(--rule); }
+    .section-line h2 { margin: 0; font-size: .95rem; font-weight: 400; }
+    .section-line span { color: var(--muted); font-size: .84rem; }
+    .papers { scroll-margin-top: 1rem; }
+    .paper-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .paper {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(2rem, 4vw, 3.6rem) clamp(0px, 2vw, 2rem) 0 0;
+    }
+    .paper + .paper {
+      padding-right: 0;
+      padding-left: clamp(1.5rem, 3vw, 3rem);
+      border-left: 1px solid var(--rule);
+    }
+    .kicker { margin-bottom: 1.1rem; }
+    .paper h3 {
+      max-width: 21ch;
+      margin-bottom: 1.3rem;
+      font-size: clamp(1.55rem, 2.5vw, 2.4rem);
+      font-weight: 400;
+      line-height: 1.16;
+      letter-spacing: -.055em;
+    }
+    .paper p { max-width: 57ch; color: var(--muted); }
+    .paper .result-label { margin: 1.25rem 0 .4rem; color: var(--ink); }
+    .result {
+      margin-bottom: 1.35rem;
+      padding-block: 1rem;
+      border-block: 1px solid var(--rule);
+      font-size: clamp(.85rem, 1.15vw, 1rem);
+    }
+    .paper-links { display: flex; flex-wrap: wrap; gap: 1.6rem; margin-top: auto; padding-top: 1.25rem; }
+    .paper-links a { white-space: nowrap; }
+    .closing {
+      display: grid;
+      grid-template-columns: minmax(8rem, 1fr) minmax(0, 2fr);
+      gap: 1.5rem;
+      margin-top: clamp(4rem, 8vw, 7rem);
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--rule);
+    }
+    .closing h2 { margin: 0; font-size: .94rem; font-weight: 400; }
+    .closing p { max-width: 68ch; margin: 0; color: var(--muted); }
+    .footer { padding-block: 1.5rem 2.2rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: .84rem; }
+    .footer p { margin: 0; }
+    @media (max-width: 760px) {
+      .masthead { align-items: flex-start; flex-wrap: wrap; }
+      .intro { padding-block: 3.7rem 4rem; }
+      .measure, .closing { grid-template-columns: 1fr; gap: .7rem; }
+      .paper-grid { grid-template-columns: 1fr; }
+      .paper { padding: 2.5rem 0 2.8rem; }
+      .paper + .paper { padding: 2.8rem 0 0; border-left: 0; border-top: 1px solid var(--rule); }
+      .paper-links { margin-top: 0; }
+      .closing { margin-top: 4rem; }
+    }
+    @media (max-width: 420px) {
+      .masthead { display: block; }
+      .masthead nav { margin-top: .7rem; }
+      .footer { align-items: flex-start; flex-direction: column; gap: .45rem; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js"></script>
+</head>
+<body>
+  <a class="skip" href="#main">skip to content</a>
+  <div class="frame">
+    <header class="masthead">
+      <a class="brand" href="./" aria-label="disorder and search, home">disorder / search</a>
+      <nav aria-label="main navigation">
+        <a href="#papers">papers</a>
+        <a href="https://github.com/jonland82/algorithmic-search-cost">repository ↗</a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">two notes on order, information, and search</p>
+        <h1 id="page-title">how much does order buy?</h1>
+        <p class="lead">an array can be nearly sorted without telling us where its disorder lies. the first note asks what a bound on disorder alone can guarantee. the second asks what changes when we can compare keys once and reuse what we learn across many searches.</p>
+        <div class="measure">
+          <p class="small-label">the shared measure</p>
+          <div class="equation">\[V(A)=\frac12\sum_{i=1}^{n}\bigl(\operatorname{rank}_A(a_i)-i\bigr)^2\]</div>
+        </div>
+      </section>
+
+      <section class="papers" id="papers" aria-labelledby="papers-title">
+        <div class="section-line">
+          <h2 id="papers-title">the papers</h2>
+          <span>01 / 02</span>
+        </div>
+        <div class="paper-grid">
+          <article class="paper" aria-labelledby="paper-one-title">
+            <p class="kicker">01 &nbsp; / &nbsp; one search</p>
+            <h3 id="paper-one-title">disorder potential and the cost of search</h3>
+            <p>a limit \(V(A)\le E\) bounds how far a key can sit from its sorted position. a modified binary search ends with a short scan; a hidden minimum shows that the scan can be necessary.</p>
+            <p class="result-label">tight worst-case cost</p>
+            <div class="equation result">\[Q^*(n,E)=\Theta\!\left(\log n+\min\{n,\sqrt E\}\right)\]</div>
+            <p>families with the same potential budget can place disorder differently, so the budget alone does not describe every useful search feature.</p>
+            <div class="paper-links">
+              <a href="./disorder_potential_search_note_v2.pdf">read the pdf ↗</a>
+              <a href="./disorder_potential_search_note_v2.tex">latex source ↗</a>
+            </div>
+          </article>
+
+          <article class="paper" aria-labelledby="paper-two-title">
+            <p class="kicker">02 &nbsp; / &nbsp; repeated search</p>
+            <h3 id="paper-two-title">search under a disorder budget</h3>
+            <p>for \(q\) searches on one fixed array, preprocessing becomes an investment. we can search each time, or build a sorted index using the displacement bound and share it across queries.</p>
+            <p class="result-label">a reusable upper bound</p>
+            <div class="equation result">\[T_q^*(n,E)=O\!\left(q\log n+\min\{qR_E,\;n\log(R_E+1)\}\right)\]</div>
+            <p>here \(R_E=1+D_E\), with \(D_E\) the largest displacement allowed by \(E\). learned hints can help when comparisons verify the structure they claim.</p>
+            <div class="paper-links">
+              <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.pdf">read the pdf ↗</a>
+              <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.tex">latex source ↗</a>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="closing" aria-labelledby="thread-title">
+        <h2 id="thread-title">the through line</h2>
+        <p>disorder limits what search must face. location information determines what search can exploit. preprocessing is worthwhile when its cost is paid back by the searches that follow.</p>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>jonathan r. landers · 2026</p>
+      <a href="https://github.com/jonland82/algorithmic-search-cost">view the repository ↗</a>
+    </footer>
+  </div>
+</body>
+</html>
