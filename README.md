@@ -23,7 +23,7 @@ The note also constructs two known input families with the same maximum potentia
 | Version | PDF | LaTeX |
 | --- | --- | --- |
 | Historical context and expanded references | [Version 2 PDF](disorder_potential_search_note_v2.pdf) | [Version 2 source](disorder_potential_search_note_v2.tex) |
-| Original note | [Original PDF](disorder_potential_search_note.pdf) | [Original source](disorder_potential_search_note.tex) |
+| Original note | [Original PDF](archived-draft-materials/disorder_potential_search_note.pdf) | [Original source](archived-draft-materials/disorder_potential_search_note.tex) |
 
 Version 2 preserves the original results and proofs while weaving in the history of rank distances, comparison sorting, adaptive search, and related work through 2026. The LaTeX source is self-contained and uses a `thebibliography` environment.
 
