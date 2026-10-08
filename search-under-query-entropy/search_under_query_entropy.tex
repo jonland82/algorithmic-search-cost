@@ -158,6 +158,13 @@ A sharper no-preprocessing result of the form
 $O(H(w)+R_E)$ per query would require a separate search argument;
 (1) makes no such claim.
 
+\paragraph{Takeaway.}
+Disorder sets the one-time price of learning the array's order, and
+query entropy sets the average price of using that order. When targets
+concentrate on a few ranks and enough queries share the index, the
+recurring $\log n$ search term becomes $H(w)+O(1)$ without giving up
+correct answers for rare targets.
+
 \smallskip
 {\footnotesize\emph{Context.} The potential, displacement lemma, and
 single-search theorem are from Landers,
