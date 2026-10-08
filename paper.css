@@ -1,0 +1,138 @@
+:root {
+  color-scheme: dark;
+  --paper: #080808;
+  --ink: #f2f0eb;
+  --muted: #b8b6b1;
+  --rule: #55534f;
+  --edge: clamp(12px, 2.6vw, 36px);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: 16px/1.72 "Courier New", Courier, monospace;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: .25em; }
+a:hover { color: #fff; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
+::selection { background: var(--ink); color: var(--paper); }
+.skip {
+  position: absolute;
+  top: -5rem;
+  left: 1rem;
+  z-index: 2;
+  padding: .45rem .7rem;
+  background: var(--ink);
+  color: var(--paper);
+}
+.skip:focus { top: 1rem; }
+.frame {
+  width: calc(100% - 2 * var(--edge));
+  max-width: 980px;
+  min-height: 100svh;
+  margin-inline: auto;
+  padding-inline: clamp(16px, 3.4vw, 46px);
+  border-inline: 1px solid var(--rule);
+}
+.masthead, .masthead nav, .paper-actions, .footer {
+  display: flex;
+  align-items: baseline;
+  gap: 1.3rem;
+  flex-wrap: wrap;
+}
+.masthead, .footer { justify-content: space-between; }
+.masthead { padding-block: 1.45rem; border-bottom: 1px solid var(--rule); }
+.brand { font-weight: 700; text-decoration: none; letter-spacing: -.025em; }
+.masthead nav, .paper-actions, .footer { font-size: .86rem; }
+.masthead nav a { text-decoration: none; border-bottom: 1px solid transparent; }
+.masthead nav a:hover, .masthead nav a:focus-visible { border-bottom-color: currentColor; }
+.paper-hero { padding-block: clamp(3.4rem, 8vw, 6rem) 2.7rem; border-bottom: 1px solid var(--rule); }
+.eyebrow, .subtitle, .byline, .toc summary, .footer { color: var(--muted); }
+.eyebrow { margin: 0 0 1.25rem; font-size: .83rem; }
+h1, h2, h3, p { margin-top: 0; }
+h1 {
+  max-width: 22ch;
+  margin-bottom: .9rem;
+  font-size: clamp(2rem, 5vw, 3.65rem);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -.065em;
+}
+.subtitle { max-width: 60ch; margin-bottom: 1.4rem; }
+.byline { margin-bottom: 1.7rem; font-size: .9rem; }
+.paper-actions { gap: 1.5rem; }
+.paper-body { min-width: 0; padding-block: 2.7rem 4.5rem; }
+.paper-body > p, .paper-body > section > p { max-width: 76ch; }
+.paper-body p { margin-bottom: 1.15rem; overflow-wrap: break-word; }
+.paper-body h2, .paper-body h3 { scroll-margin-top: 1.5rem; font-weight: 400; }
+.paper-body h2 {
+  margin: 3.3rem 0 1.3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: clamp(1.34rem, 2.4vw, 1.75rem);
+  line-height: 1.23;
+  letter-spacing: -.045em;
+}
+.paper-body h3 {
+  margin: 2.2rem 0 .7rem;
+  font-size: 1.08rem;
+  line-height: 1.35;
+}
+.paper-body h2:first-child { margin-top: 0; }
+.paper-body .abstract { padding-left: 1.1rem; border-left: 1px solid var(--rule); }
+.paper-body .math.display {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 1.2rem 0;
+  padding: .45rem 0 .7rem;
+  scroll-margin-top: 1.5rem;
+}
+.paper-body .math.display mjx-container[display="true"] { margin: 0 !important; }
+.paper-body .math.inline { white-space: nowrap; }
+.paper-body .theorem, .paper-body .lemma, .paper-body .proposition {
+  margin: 2rem 0;
+  padding: 1.2rem 1.3rem .1rem;
+  border-block: 1px solid var(--rule);
+}
+.paper-body .theorem p, .paper-body .lemma p, .paper-body .proposition p { max-width: none; }
+.paper-body .theorem strong, .paper-body .lemma strong, .paper-body .proposition strong { color: var(--ink); }
+.paper-body .toc {
+  margin: 0 0 2.6rem;
+  padding: 1rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-size: .9rem;
+}
+.toc summary { cursor: pointer; }
+.toc ol { margin: 1rem 0 .2rem; padding-left: 1.5rem; }
+.toc li + li { margin-top: .3rem; }
+.paper-body table { width: 100%; margin: 1.7rem 0; border-collapse: collapse; font-size: .92rem; }
+.paper-body th, .paper-body td { padding: .75rem .7rem; border-bottom: 1px solid var(--rule); text-align: left !important; vertical-align: top; }
+.paper-body th { font-weight: 400; color: var(--muted); }
+.paper-body .references { margin-top: 3.5rem; }
+.references ol { padding-left: 1.8rem; }
+.references li { padding-left: .3rem; margin-bottom: 1rem; overflow-wrap: anywhere; }
+.citation-link { white-space: nowrap; }
+.footnotes { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--rule); font-size: .9rem; }
+.footer { padding-block: 1.5rem 2rem; border-top: 1px solid var(--rule); }
+.footer p { margin: 0; }
+@media (max-width: 640px) {
+  .masthead { align-items: flex-start; }
+  .masthead nav { width: 100%; }
+  .paper-hero { padding-block: 3.5rem 2.2rem; }
+  .paper-body { padding-block: 2rem 3.5rem; }
+  .paper-body h2 { margin-top: 2.7rem; }
+  .paper-body .theorem, .paper-body .lemma, .paper-body .proposition { padding-inline: .8rem; }
+  .paper-body table, .paper-body tbody, .paper-body tr, .paper-body td { display: block; width: 100%; }
+  .paper-body thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+  .paper-body tr { padding-block: .7rem; border-top: 1px solid var(--rule); }
+  .paper-body td { padding: .45rem 0; border: 0; }
+  .paper-body td::before { content: attr(data-label); display: block; color: var(--muted); font-size: .8rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
