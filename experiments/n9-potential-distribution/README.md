@@ -87,4 +87,4 @@ The normal shape is useful for estimating how common a potential budget is. Stro
 
 ## Takeaway
 
-Because the approximate normal law centers uniform random orderings near $\mu_n\sim n^3/12$, far above the $\Theta(n^2)$ saturation threshold, the potential-only bound narrows the search window only on a vanishing low-disorder tail.
+Because the approximate normal law centers uniform random orderings near $\mu_n\sim n^3/12$, far above the $\Theta(n^2)$ saturation threshold, the potential-only bound narrows the search window only on a vanishing low-disorder tail. Most random shuffles are too mixed up for this potential bound to narrow the search, so its useful cases are the rare arrays already close to sorted.
