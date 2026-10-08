@@ -92,27 +92,14 @@
     .section-line h2 { margin: 0; font-size: .95rem; font-weight: 400; }
     .section-line span { color: var(--muted); font-size: .84rem; }
     .papers { scroll-margin-top: 1rem; }
-    .paper-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .paper-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
     .paper {
       min-width: 0;
       display: flex;
       flex-direction: column;
-      padding: clamp(2rem, 4vw, 3.6rem) clamp(0px, 2vw, 2rem) 0 0;
+      padding: clamp(2rem, 4vw, 3.6rem) 0;
     }
-    .paper + .paper {
-      padding-right: 0;
-      padding-left: clamp(1.5rem, 3vw, 3rem);
-      border-left: 1px solid var(--rule);
-    }
-    .paper-grid .paper-wide {
-      grid-column: 1 / -1;
-      margin-top: 2.4rem;
-      padding-left: 0;
-      padding-right: 0;
-      border-left: 0;
-      border-top: 1px solid var(--rule);
-    }
-    .paper-wide .result { max-width: 900px; }
+    .paper + .paper { border-top: 1px solid var(--rule); }
     .kicker { margin-bottom: 1.1rem; }
     .paper h3 {
       max-width: 21ch;
@@ -125,6 +112,7 @@
     .paper p { max-width: 57ch; color: var(--muted); }
     .paper .result-label { margin: 1.25rem 0 .4rem; color: var(--ink); }
     .result {
+      max-width: 900px;
       margin-bottom: 1.35rem;
       padding-block: 1rem;
       border-block: 1px solid var(--rule);
@@ -148,10 +136,7 @@
       .masthead { align-items: flex-start; flex-wrap: wrap; }
       .intro { padding-block: 3.7rem 4rem; }
       .measure, .closing { grid-template-columns: 1fr; gap: .7rem; }
-      .paper-grid { grid-template-columns: 1fr; }
-      .paper { padding: 2.5rem 0 2.8rem; }
-      .paper + .paper { padding: 2.8rem 0 0; border-left: 0; border-top: 1px solid var(--rule); }
-      .paper-grid .paper-wide { margin-top: 0; }
+      .paper { padding: 2.5rem 0; }
       .paper-links { margin-top: 0; }
       .closing { margin-top: 4rem; }
     }
@@ -220,7 +205,8 @@
               <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.tex">latex source ↗</a>
             </div>
           </article>
-          <article class="paper paper-wide" aria-labelledby="paper-three-title">
+
+          <article class="paper" aria-labelledby="paper-three-title">
             <p class="kicker">03 &nbsp; / &nbsp; query entropy</p>
             <h3 id="paper-three-title">search under disorder and query entropy</h3>
             <p>the array's disorder and the targets' uncertainty are separate. a sorted index built using the disorder budget lets a search tree spend fewer comparisons on likely targets.</p>
