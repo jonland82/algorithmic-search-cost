@@ -84,3 +84,7 @@ P(V_n<E_{\mathrm{sat}})
 $$
 
 The normal shape is useful for estimating how common a potential budget is. Stronger typical search bounds need a model that favors nearly sorted arrays, or additional information about where the disorder lies.
+
+## Takeaway
+
+Because the approximate normal law centers uniform random orderings near $\mu_n\sim n^3/12$, far above the $\Theta(n^2)$ saturation threshold, the potential-only bound narrows the search window only on a vanishing low-disorder tail.
