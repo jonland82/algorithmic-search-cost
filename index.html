@@ -67,12 +67,13 @@
     h1, h2, h3, p { margin-top: 0; }
     h1 {
       max-width: 16ch;
-      margin-bottom: 1.6rem;
+      margin-bottom: .7rem;
       font-size: clamp(2.45rem, 5.5vw, 5.1rem);
       font-weight: 400;
       line-height: 1.04;
       letter-spacing: -.075em;
     }
+    .byline { margin-bottom: 2rem; color: var(--muted); font-size: .9rem; letter-spacing: .03em; }
     .lead { max-width: 66ch; color: var(--muted); font-size: clamp(1rem, 1.55vw, 1.13rem); }
     .measure {
       display: grid;
@@ -170,6 +171,7 @@
       <section class="intro" aria-labelledby="page-title">
         <p class="eyebrow">two notes on order, information, and search</p>
         <h1 id="page-title">how much does order buy?</h1>
+        <p class="byline">jonathan r. landers</p>
         <p class="lead">an array can be nearly sorted without telling us where its disorder lies. the first note asks what a bound on disorder alone can guarantee. the second asks what changes when we can compare keys once and reuse what we learn across many searches.</p>
         <div class="measure">
           <p class="small-label">the shared measure</p>
