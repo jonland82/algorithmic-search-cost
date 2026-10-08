@@ -19,6 +19,10 @@ $$
 
 The [archived original draft](archived-draft-materials/disorder_potential_search_note.pdf) and its [LaTeX source](archived-draft-materials/disorder_potential_search_note.tex) remain available for historical context.
 
+## Experiment
+
+[Potential across random permutations](experiments/n9-potential-distribution/README.md) shows the exact $n=9$ histogram and explains the distribution and search-bound implications for general $n$.
+
 ## Models
 
 The first paper gives the search algorithm a numerical promise $V(A)\le E$, with no auxiliary index or preprocessing transcript. The extension allows preprocessing comparisons among array keys and an $O(n)$-word index, charging their cost along with the later target comparisons.
