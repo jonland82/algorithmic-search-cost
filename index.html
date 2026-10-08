@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080808">
-  <meta name="description" content="Two notes on disorder potential, comparison search, and the value of preprocessing.">
+  <meta name="description" content="Three notes on disorder potential, comparison search, preprocessing, and query entropy.">
   <title>disorder / search — jonathan r. landers</title>
   <style>
     :root {
@@ -104,6 +104,15 @@
       padding-left: clamp(1.5rem, 3vw, 3rem);
       border-left: 1px solid var(--rule);
     }
+    .paper-grid .paper-wide {
+      grid-column: 1 / -1;
+      margin-top: 2.4rem;
+      padding-left: 0;
+      padding-right: 0;
+      border-left: 0;
+      border-top: 1px solid var(--rule);
+    }
+    .paper-wide .result { max-width: 900px; }
     .kicker { margin-bottom: 1.1rem; }
     .paper h3 {
       max-width: 21ch;
@@ -142,6 +151,7 @@
       .paper-grid { grid-template-columns: 1fr; }
       .paper { padding: 2.5rem 0 2.8rem; }
       .paper + .paper { padding: 2.8rem 0 0; border-left: 0; border-top: 1px solid var(--rule); }
+      .paper-grid .paper-wide { margin-top: 0; }
       .paper-links { margin-top: 0; }
       .closing { margin-top: 4rem; }
     }
@@ -169,10 +179,10 @@
 
     <main id="main">
       <section class="intro" aria-labelledby="page-title">
-        <p class="eyebrow">two notes on order, information, and search</p>
+        <p class="eyebrow">three notes on order, information, and search</p>
         <h1 id="page-title">how much does order buy?</h1>
         <p class="byline">jonathan r. landers</p>
-        <p class="lead">an array can be nearly sorted without telling us where its disorder lies. the first note asks what a bound on disorder alone can guarantee. the second asks what changes when we can compare keys once and reuse what we learn across many searches.</p>
+        <p class="lead">an array can be nearly sorted without telling us where its disorder lies. the first note asks what a bound on disorder alone can guarantee. the second asks what changes when we can compare keys once and reuse what we learn across many searches. the third asks how a known pattern of target queries changes the expected search cost.</p>
         <div class="measure">
           <p class="small-label">the shared measure</p>
           <div class="equation">\[V(A)=\frac12\sum_{i=1}^{n}\bigl(\operatorname{rank}_A(a_i)-i\bigr)^2\]</div>
@@ -182,7 +192,7 @@
       <section class="papers" id="papers" aria-labelledby="papers-title">
         <div class="section-line">
           <h2 id="papers-title">the papers</h2>
-          <span>01 / 02</span>
+          <span>01 / 03</span>
         </div>
         <div class="paper-grid">
           <article class="paper" aria-labelledby="paper-one-title">
@@ -210,12 +220,24 @@
               <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.tex">latex source ↗</a>
             </div>
           </article>
+          <article class="paper paper-wide" aria-labelledby="paper-three-title">
+            <p class="kicker">03 &nbsp; / &nbsp; query entropy</p>
+            <h3 id="paper-three-title">search under disorder and query entropy</h3>
+            <p>the array's disorder and the targets' uncertainty are separate. a sorted index built using the disorder budget lets a search tree spend fewer comparisons on likely targets.</p>
+            <p class="result-label">expected cost with a known query prior</p>
+            <div class="equation result">\[\mathcal T_q(n,E,w)=O\!\left(\min\left\{q(\log n+R_E),\;n\log(R_E+1)+q(H(w)+1)\right\}\right)\]</div>
+            <p>here \(H(w)\) is the entropy of target ranks and gaps. the index cost is paid once; the entropy term is necessary up to a constant factor.</p>
+            <div class="paper-links">
+              <a href="./search-under-query-entropy/search_under_query_entropy.pdf">read the pdf ↗</a>
+              <a href="./search-under-query-entropy/search_under_query_entropy.tex">latex source ↗</a>
+            </div>
+          </article>
         </div>
       </section>
 
       <section class="closing" aria-labelledby="thread-title">
         <h2 id="thread-title">the through line</h2>
-        <p>disorder limits what search must face. location information determines what search can exploit. preprocessing is worthwhile when its cost is paid back by the searches that follow.</p>
+        <p>disorder limits what search must face. location information determines what search can exploit. preprocessing is worthwhile when its cost is paid back by the searches that follow. a query prior can then lower the expected search depth.</p>
       </section>
     </main>
 
