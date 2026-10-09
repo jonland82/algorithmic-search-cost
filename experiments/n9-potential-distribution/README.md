@@ -58,7 +58,7 @@ $$
 when a valid promise $V(A)\le E$ is supplied. The [repeated-search extension](../../search-under-a-disorder-budget/search_under_a_disorder_budget.pdf) gives
 
 $$
-T_q^*(n,E)=O\!\left(q\log n+\min\{qR_E,\;n\log(R_E+1)\}\right),
+T_q^*(n,E)=O\!\left(q\log n+\min\{qR_E,\;n\log(R_E+1),\;n[1+\log(1+E/n)]\}\right),
 \qquad R_E=D_E+1,
 $$
 

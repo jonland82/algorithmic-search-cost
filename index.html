@@ -212,10 +212,10 @@
           <article class="paper" aria-labelledby="paper-two-title">
             <p class="kicker">02 &nbsp; / &nbsp; repeated search</p>
             <h3 id="paper-two-title">search under a disorder budget</h3>
-            <p>for \(q\) searches on one fixed array, preprocessing becomes an investment. we can search each time, or build a sorted index using the displacement bound and share it across queries.</p>
+            <p>for \(q\) searches on one fixed array, preprocessing becomes an investment. we can search each time, build an index from the displacement bound, or sort adaptively using the potential's inversion bound.</p>
             <p class="result-label">a reusable upper bound</p>
-            <div class="equation result">\[T_q^*(n,E)=O\!\left(q\log n+\min\{qR_E,\;n\log(R_E+1)\}\right)\]</div>
-            <p>here \(R_E=1+D_E\), with \(D_E\) the largest displacement allowed by \(E\). learned hints can help when comparisons verify the structure they claim.</p>
+            <div class="equation result">\[T_q^*(n,E)=O\!\left(q\log n+\min\{qR_E,\;n\log(R_E+1),\;n[1+\log(1+E/n)]\}\right)\]</div>
+            <p>here \(R_E=1+D_E\), with \(D_E\) the displacement bound from \(E\). the potential also bounds inversions, making a cheaper index possible for nearly sorted arrays. learned hints help when comparisons verify their claims.</p>
             <div class="paper-links">
               <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.html">read html ↗</a>
               <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.pdf">read the pdf ↗</a>
