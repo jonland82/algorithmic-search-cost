@@ -67,6 +67,9 @@ h1 {
 .paper-body { min-width: 0; padding-block: 2.7rem 4.5rem; }
 .paper-body > p, .paper-body > section > p { max-width: 76ch; }
 .paper-body p { margin-bottom: 1.15rem; overflow-wrap: break-word; }
+.paper-body figure { margin: 2rem 0; }
+.paper-body figure img { display: block; max-width: 100%; height: auto; }
+.paper-body figcaption { margin-top: .7rem; color: var(--muted); font-size: .86rem; }
 .paper-body h2, .paper-body h3 { scroll-margin-top: 1.5rem; font-weight: 400; }
 .paper-body h2 {
   margin: 3.3rem 0 1.3rem;

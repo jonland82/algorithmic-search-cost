@@ -1,4 +1,4 @@
-"""Build responsive HTML editions from the three LaTeX papers.
+"""Build responsive HTML editions from the LaTeX sources.
 
 Requires pandoc and beautifulsoup4. Run from any directory:
     python scripts/build_paper_html.py
@@ -24,6 +24,7 @@ class Paper:
     subtitle: str
     date: str
     description: str
+    edition_label: str
 
 
 PAPERS = (
@@ -34,6 +35,16 @@ PAPERS = (
         "A balance law and a separation by disorder location",
         "October 4, 2026",
         "The full mobile-friendly HTML edition of Disorder Potential and the Cost of Search.",
+        "paper 01 / 02",
+    ),
+    Paper(
+        "experiments/n9-potential-distribution/potential_across_random_permutations.tex",
+        "N",
+        "Potential Across Random Permutations",
+        "A companion note on when disorder budgets help search",
+        "October 9, 2026",
+        "Exact permutation counts and general bounds explain when a disorder budget helps search.",
+        "companion note",
     ),
     Paper(
         "search-under-a-disorder-budget/search_under_a_disorder_budget.tex",
@@ -42,6 +53,7 @@ PAPERS = (
         "A note on preprocessing, repeated queries, and learned structure",
         "October 7, 2026",
         "The full mobile-friendly HTML edition of Search Under a Disorder Budget.",
+        "paper 02 / 02",
     ),
     Paper(
         "search-under-query-entropy/search_under_query_entropy.tex",
@@ -50,6 +62,7 @@ PAPERS = (
         "A two-budget note on repeated comparison search",
         "October 8, 2026",
         "The full mobile-friendly HTML edition of Search Under Disorder and Query Entropy.",
+        "work in progress",
     ),
 )
 
@@ -196,7 +209,7 @@ def build(paper: Paper) -> Path:
     toc, body = convert_body(paper)
     source = Path(paper.source)
     output = ROOT / source.with_suffix(".html")
-    prefix = "../" if source.parent != Path(".") else "./"
+    prefix = "../" * len(source.parent.parts) if source.parent != Path(".") else "./"
     title = escape(paper.title)
     subtitle = escape(paper.subtitle)
     page = f"""<!doctype html>
@@ -217,14 +230,14 @@ def build(paper: Paper) -> Path:
     <header class="masthead">
       <a class="brand" href="{prefix}index.html" aria-label="disorder and search, home">disorder / search</a>
       <nav aria-label="paper links">
-        <a href="{prefix}index.html#papers">all papers</a>
+        <a href="{prefix}index.html#papers">papers and note</a>
         <a href="./{source.stem}.pdf">pdf</a>
         <a href="./{source.name}">latex</a>
       </nav>
     </header>
     <main>
       <header class="paper-hero">
-        <p class="eyebrow">paper {paper.number} / 03 &nbsp;·&nbsp; html edition</p>
+        <p class="eyebrow">{escape(paper.edition_label)} &nbsp;·&nbsp; html edition</p>
         <h1>{title}</h1>
         <p class="subtitle">{subtitle}</p>
         <p class="byline">Jonathan R. Landers &nbsp;·&nbsp; {escape(paper.date)}</p>

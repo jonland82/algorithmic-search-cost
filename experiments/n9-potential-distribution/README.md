@@ -1,5 +1,7 @@
 # Disorder potential across random permutations
 
+Read the companion note in [HTML](potential_across_random_permutations.html), [PDF](potential_across_random_permutations.pdf), or [LaTeX](potential_across_random_permutations.tex). This README holds its data and reproduction details.
+
 The [first paper](../../disorder_potential_search_note_v2.pdf) measures how far an array is from sorted order using the ranks of its entries. The experiment here starts with nine distinct random integers and enumerates every ordering of them. The integers are just labels: once all orderings are included, only their ranks matter.
 
 ![Exact histogram of disorder potential for all permutations of nine distinct values](potential_histogram.png)

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080808">
-  <meta name="description" content="Three notes on disorder potential, comparison search, preprocessing, and query entropy.">
+  <meta name="description" content="Two papers and a companion note on disorder potential, comparison search, preprocessing, and random permutations.">
   <title>disorder / search — jonathan r. landers</title>
   <style>
     :root {
@@ -164,10 +164,10 @@
 
     <main id="main">
       <section class="intro" aria-labelledby="page-title">
-        <p class="eyebrow">three notes on order, information, and search</p>
+        <p class="eyebrow">two papers and a companion note on disorder and search</p>
         <h1 id="page-title">how much does order buy?</h1>
         <p class="byline">jonathan r. landers</p>
-        <p class="lead">an array can be nearly sorted without telling us where its disorder lies. the first note asks what a bound on disorder alone can guarantee. the second asks what changes when we can compare keys once and reuse what we learn across many searches. the third asks how a known pattern of target queries changes the expected search cost.</p>
+        <p class="lead">an array can be nearly sorted without telling us where its disorder lies. the first paper asks what a bound on disorder alone can guarantee. a companion note checks how often that bound helps under uniform shuffling. the second paper asks what changes when comparisons can be reused across many searches.</p>
         <div class="measure">
           <p class="small-label">the shared measure</p>
           <div class="equation">\[V(A)=\frac12\sum_{i=1}^{n}\bigl(\operatorname{rank}_A(a_i)-i\bigr)^2\]</div>
@@ -176,8 +176,8 @@
 
       <section class="papers" id="papers" aria-labelledby="papers-title">
         <div class="section-line">
-          <h2 id="papers-title">the papers</h2>
-          <span>01 / 03</span>
+          <h2 id="papers-title">the papers and companion note</h2>
+          <span>two papers / one note</span>
         </div>
         <div class="paper-grid">
           <article class="paper" aria-labelledby="paper-one-title">
@@ -194,6 +194,21 @@
             </div>
           </article>
 
+          <article class="paper" aria-labelledby="companion-title">
+            <p class="kicker">companion note &nbsp; / &nbsp; after paper 01</p>
+            <h3 id="companion-title">potential across random permutations</h3>
+            <p>an exact histogram for all \(9!\) orderings shows the shape of the same potential used in paper 01. exact moments and a tail bound then show how often a chosen disorder budget covers a uniform shuffle.</p>
+            <p class="result-label">the typical uniform shuffle</p>
+            <div class="equation result">\[\mathbb E V_n\sim n^3/12,\qquad E_{\mathrm{sat}}\sim n^2/2\]</div>
+            <p>most uniform shuffles eventually lie above the point where a scalar potential budget narrows the search window. this sets the context for paper 02's preprocessing tradeoff and for models that favor nearly sorted arrays.</p>
+            <div class="paper-links">
+              <a href="./experiments/n9-potential-distribution/potential_across_random_permutations.html">read html ↗</a>
+              <a href="./experiments/n9-potential-distribution/potential_across_random_permutations.pdf">read the pdf ↗</a>
+              <a href="./experiments/n9-potential-distribution/potential_across_random_permutations.tex">latex source ↗</a>
+              <a href="./experiments/n9-potential-distribution/README.md">data + code ↗</a>
+            </div>
+          </article>
+
           <article class="paper" aria-labelledby="paper-two-title">
             <p class="kicker">02 &nbsp; / &nbsp; repeated search</p>
             <h3 id="paper-two-title">search under a disorder budget</h3>
@@ -207,26 +222,12 @@
               <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.tex">latex source ↗</a>
             </div>
           </article>
-
-          <article class="paper" aria-labelledby="paper-three-title">
-            <p class="kicker">03 &nbsp; / &nbsp; query entropy</p>
-            <h3 id="paper-three-title">search under disorder and query entropy</h3>
-            <p>the array's disorder and the targets' uncertainty are separate. a sorted index built using the disorder budget lets a search tree spend fewer comparisons on likely targets.</p>
-            <p class="result-label">expected cost with a known query prior</p>
-            <div class="equation result">\[\mathcal T_q(n,E,w)=O\!\left(\min\left\{q(\log n+R_E),\;n\log(R_E+1)+q(H(w)+1)\right\}\right)\]</div>
-            <p>here \(H(w)\) is the entropy of target ranks and gaps. the index cost is paid once; the entropy term is necessary up to a constant factor.</p>
-            <div class="paper-links">
-              <a href="./search-under-query-entropy/search_under_query_entropy.html">read html ↗</a>
-              <a href="./search-under-query-entropy/search_under_query_entropy.pdf">read the pdf ↗</a>
-              <a href="./search-under-query-entropy/search_under_query_entropy.tex">latex source ↗</a>
-            </div>
-          </article>
         </div>
       </section>
 
       <section class="closing" aria-labelledby="thread-title">
         <h2 id="thread-title">the through line</h2>
-        <p>disorder limits what search must face. location information determines what search can exploit. preprocessing is worthwhile when its cost is paid back by the searches that follow. a query prior can then lower the expected search depth.</p>
+        <p>disorder limits what search must face. the permutation note shows that typical uniform shuffles are too disordered for the scalar budget to narrow the search window. location information and reusable preprocessing matter when the array has more favorable structure.</p>
       </section>
     </main>
 
