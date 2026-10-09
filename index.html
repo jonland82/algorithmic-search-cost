@@ -56,7 +56,8 @@
       padding-block: 1.65rem;
       border-bottom: 1px solid var(--rule);
     }
-    .brand { font-weight: 700; text-decoration: none; letter-spacing: -.025em; }
+    .brand { display: inline-flex; align-items: center; gap: .55em; font-weight: 700; text-decoration: none; letter-spacing: -.025em; white-space: nowrap; }
+    .brand-icon { display: block; width: 1.35em; height: 1.35em; flex: none; }
     .masthead nav { display: flex; gap: clamp(1rem, 3vw, 2.4rem); }
     .masthead nav a { text-decoration: none; border-bottom: 1px solid transparent; }
     .masthead nav a:hover, .masthead nav a:focus-visible { border-bottom-color: currentColor; }
@@ -155,7 +156,7 @@
   <a class="skip" href="#main">skip to content</a>
   <div class="frame">
     <header class="masthead">
-      <a class="brand" href="./" aria-label="disorder and search, home">disorder / search</a>
+      <a class="brand" href="./" aria-label="disorder and search, home"><img class="brand-icon" src="./ninja-mark.svg" alt="" aria-hidden="true">disorder / search</a>
       <nav aria-label="main navigation">
         <a href="#papers">papers</a>
         <a href="https://github.com/jonland82/algorithmic-search-cost">repository ↗</a>

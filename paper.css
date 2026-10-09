@@ -45,7 +45,8 @@ a:focus-visible, summary:focus-visible { outline: 2px solid var(--ink); outline-
 }
 .masthead, .footer { justify-content: space-between; }
 .masthead { padding-block: 1.45rem; border-bottom: 1px solid var(--rule); }
-.brand { font-weight: 700; text-decoration: none; letter-spacing: -.025em; }
+.brand { display: inline-flex; align-items: center; gap: .55em; font-weight: 700; text-decoration: none; letter-spacing: -.025em; white-space: nowrap; }
+.brand-icon { display: block; width: 1.35em; height: 1.35em; flex: none; }
 .masthead nav, .paper-actions, .footer { font-size: .86rem; }
 .masthead nav a { text-decoration: none; border-bottom: 1px solid transparent; }
 .masthead nav a:hover, .masthead nav a:focus-visible { border-bottom-color: currentColor; }

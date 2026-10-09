@@ -228,7 +228,7 @@ def build(paper: Paper) -> Path:
   <a class="skip" href="#paper-body">skip to paper</a>
   <div class="frame">
     <header class="masthead">
-      <a class="brand" href="{prefix}index.html" aria-label="disorder and search, home">disorder / search</a>
+      <a class="brand" href="{prefix}index.html" aria-label="disorder and search, home"><img class="brand-icon" src="{prefix}ninja-mark.svg" alt="" aria-hidden="true">disorder / search</a>
       <nav aria-label="paper links">
         <a href="{prefix}index.html#papers">papers and note</a>
         <a href="./{source.stem}.pdf">pdf</a>
