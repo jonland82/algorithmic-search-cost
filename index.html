@@ -96,10 +96,13 @@
     .paper-grid { display: grid; grid-template-columns: minmax(0, 1fr); }
     .paper {
       min-width: 0;
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+      gap: clamp(1.75rem, 4vw, 3rem);
       padding: clamp(2rem, 4vw, 3.6rem) 0;
     }
+    .paper-intro, .paper-detail { min-width: 0; }
+    .paper-detail { display: flex; flex-direction: column; }
     .paper + .paper { border-top: 1px solid var(--rule); }
     .kicker { margin-bottom: 1.1rem; }
     .paper h3 {
@@ -110,16 +113,16 @@
       line-height: 1.16;
       letter-spacing: -.055em;
     }
-    .paper p { max-width: 57ch; color: var(--muted); }
-    .paper .result-label { margin: 1.25rem 0 .4rem; color: var(--ink); }
+    .paper p { color: var(--muted); }
+    .paper-intro > p:last-child { margin-bottom: 0; }
+    .paper .result-label { margin: 0 0 .4rem; color: var(--ink); }
     .result {
-      max-width: 900px;
       margin-bottom: 1.35rem;
       padding-block: 1rem;
       border-block: 1px solid var(--rule);
-      font-size: clamp(.85rem, 1.15vw, 1rem);
+      font-size: 1rem;
     }
-    .paper-links { display: flex; flex-wrap: wrap; gap: 1.6rem; margin-top: auto; padding-top: 1.25rem; }
+    .paper-links { display: flex; flex-wrap: wrap; gap: .65rem 1.4rem; margin-top: auto; padding-top: 1.25rem; }
     .paper-links a { white-space: nowrap; }
     .closing {
       display: grid;
@@ -133,8 +136,15 @@
     .closing p { max-width: 68ch; margin: 0; color: var(--muted); }
     .footer { padding-block: 1.5rem 2.2rem; border-top: 1px solid var(--rule); color: var(--muted); font-size: .84rem; }
     .footer p { margin: 0; }
+    @media (max-width: 840px) {
+      .paper { grid-template-columns: minmax(0, 1fr); gap: 1.2rem; }
+      .paper .result-label { margin-top: .5rem; }
+    }
     @media (max-width: 760px) {
       .masthead { align-items: flex-start; flex-wrap: wrap; }
+      .masthead nav { width: 100%; }
+      .section-line { flex-wrap: wrap; gap: .35rem 1rem; }
+      .section-line span { margin-left: auto; }
       .intro { padding-block: 3.7rem 4rem; }
       .measure, .closing { grid-template-columns: 1fr; gap: .7rem; }
       .paper { padding: 2.5rem 0; }
@@ -182,45 +192,61 @@
         </div>
         <div class="paper-grid">
           <article class="paper" aria-labelledby="paper-one-title">
-            <p class="kicker">01 &nbsp; / &nbsp; one search</p>
-            <h3 id="paper-one-title">disorder potential and the cost of search</h3>
-            <p>a limit \(V(A)\le E\) bounds how far a key can sit from its sorted position. a modified binary search ends with a short scan; a hidden minimum shows that the scan can be necessary.</p>
-            <p class="result-label">tight worst-case cost</p>
-            <div class="equation result">\[Q^*(n,E)=\Theta\!\left(\log n+\min\{n,\sqrt E\}\right)\]</div>
-            <p>families with the same potential budget can place disorder differently, so the budget alone does not describe every useful search feature.</p>
-            <div class="paper-links">
-              <a href="./disorder_potential_search_note_v2.html">read html ↗</a>
-              <a href="./disorder_potential_search_note_v2.pdf">read the pdf ↗</a>
-              <a href="./disorder_potential_search_note_v2.tex">latex source ↗</a>
+            <div class="paper-intro">
+              <p class="kicker">01 &nbsp; / &nbsp; one search</p>
+              <h3 id="paper-one-title">disorder potential and the cost of search</h3>
+              <p>a limit \(V(A)\le E\) bounds how far a key can sit from its sorted position. a modified binary search ends with a short scan; a hidden minimum shows that the scan can be necessary.</p>
+            </div>
+            <div class="paper-detail">
+              <p class="result-label">tight worst-case cost</p>
+              <div class="equation result">\[Q^*(n,E)=\Theta\!\left(\log n+\min\{n,\sqrt E\}\right)\]</div>
+              <p>families with the same potential budget can place disorder differently, so the budget alone does not describe every useful search feature.</p>
+              <div class="paper-links">
+                <a href="./disorder_potential_search_note_v2.html">read html ↗</a>
+                <a href="./disorder_potential_search_note_v2.pdf">read the pdf ↗</a>
+                <a href="./disorder_potential_search_note_v2.tex">latex source ↗</a>
+              </div>
             </div>
           </article>
 
           <article class="paper" aria-labelledby="companion-title">
-            <p class="kicker">companion note &nbsp; / &nbsp; after paper 01</p>
-            <h3 id="companion-title">potential across random permutations</h3>
-            <p>an exact histogram for all \(9!\) orderings shows the shape of the same potential used in paper 01. exact moments and a tail bound then show how often a chosen disorder budget covers a uniform shuffle.</p>
-            <p class="result-label">the typical uniform shuffle</p>
-            <div class="equation result">\[\mathbb E V_n\sim n^3/12,\qquad E_{\mathrm{sat}}\sim n^2/2\]</div>
-            <p>most uniform shuffles eventually lie above the point where a scalar potential budget narrows the search window. this sets the context for paper 02's preprocessing tradeoff and for models that favor nearly sorted arrays.</p>
-            <div class="paper-links">
-              <a href="./experiments/n9-potential-distribution/potential_across_random_permutations.html">read html ↗</a>
-              <a href="./experiments/n9-potential-distribution/potential_across_random_permutations.pdf">read the pdf ↗</a>
-              <a href="./experiments/n9-potential-distribution/potential_across_random_permutations.tex">latex source ↗</a>
-              <a href="./experiments/n9-potential-distribution/README.md">data + code ↗</a>
+            <div class="paper-intro">
+              <p class="kicker">companion note &nbsp; / &nbsp; after paper 01</p>
+              <h3 id="companion-title">potential across random permutations</h3>
+              <p>an exact histogram for all \(9!\) orderings shows the shape of the same potential used in paper 01. exact moments and a tail bound then show how often a chosen disorder budget covers a uniform shuffle.</p>
+            </div>
+            <div class="paper-detail">
+              <p class="result-label">the typical uniform shuffle</p>
+              <div class="equation result">\[\mathbb E V_n\sim n^3/12,\qquad E_{\mathrm{sat}}\sim n^2/2\]</div>
+              <p>most uniform shuffles eventually lie above the point where a scalar potential budget narrows the search window. this sets the context for paper 02's preprocessing tradeoff and for models that favor nearly sorted arrays.</p>
+              <div class="paper-links">
+                <a href="./experiments/n9-potential-distribution/potential_across_random_permutations.html">read html ↗</a>
+                <a href="./experiments/n9-potential-distribution/potential_across_random_permutations.pdf">read the pdf ↗</a>
+                <a href="./experiments/n9-potential-distribution/potential_across_random_permutations.tex">latex source ↗</a>
+                <a href="./experiments/n9-potential-distribution/README.md">data + code ↗</a>
+              </div>
             </div>
           </article>
 
           <article class="paper" aria-labelledby="paper-two-title">
-            <p class="kicker">02 &nbsp; / &nbsp; repeated search</p>
-            <h3 id="paper-two-title">search under a disorder budget</h3>
-            <p>for \(q\) searches on one fixed array, preprocessing becomes an investment. we can search each time, build an index from the displacement bound, or sort adaptively using the potential's inversion bound.</p>
-            <p class="result-label">a reusable upper bound</p>
-            <div class="equation result">\[T_q^*(n,E)=O\!\left(q\log n+\min\{qR_E,\;n\log(R_E+1),\;n[1+\log(1+E/n)]\}\right)\]</div>
-            <p>here \(R_E=1+D_E\), with \(D_E\) the displacement bound from \(E\). the potential also bounds inversions, making a cheaper index possible for nearly sorted arrays. learned hints help when comparisons verify their claims.</p>
-            <div class="paper-links">
-              <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.html">read html ↗</a>
-              <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.pdf">read the pdf ↗</a>
-              <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.tex">latex source ↗</a>
+            <div class="paper-intro">
+              <p class="kicker">02 &nbsp; / &nbsp; repeated search</p>
+              <h3 id="paper-two-title">search under a disorder budget</h3>
+              <p>for \(q\) searches on one fixed array, preprocessing becomes an investment. we can search each time, build an index from the displacement bound, or sort adaptively using the potential's inversion bound.</p>
+            </div>
+            <div class="paper-detail">
+              <p class="result-label">a reusable upper bound</p>
+              <div class="equation result">\[\begin{aligned}
+T_q^*(n,E)=O\bigl(&q\log n+\\
+&\min\{qR_E,\;n\log(R_E+1),\\
+&\qquad n[1+\log(1+E/n)]\}\bigr)
+\end{aligned}\]</div>
+              <p>here \(R_E=1+D_E\), with \(D_E\) the displacement bound from \(E\). the potential also bounds inversions, making a cheaper index possible for nearly sorted arrays. learned hints help when comparisons verify their claims.</p>
+              <div class="paper-links">
+                <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.html">read html ↗</a>
+                <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.pdf">read the pdf ↗</a>
+                <a href="./search-under-a-disorder-budget/search_under_a_disorder_budget.tex">latex source ↗</a>
+              </div>
             </div>
           </article>
         </div>
