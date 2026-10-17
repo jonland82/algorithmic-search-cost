@@ -1,0 +1,228 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage[margin=.79in,top=.72in,bottom=.72in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,microtype}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx,booktabs,array,fancyhdr}
+\usepackage[hidelinks]{hyperref}
+\hypersetup{pdftitle={From Rank Displacement to Machine Range Overlap},pdfauthor={J. R. Landers}}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4.4pt}
+\setlength{\textfloatsep}{11pt}
+\setlength{\intextsep}{11pt}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\footnotesize From Rank Displacement to Machine Range Overlap}
+\fancyhead[R]{}
+\fancyfoot[C]{\footnotesize\thepage}
+\renewcommand{\headrulewidth}{.35pt}
+\setlength{\headheight}{13pt}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\renewcommand{\proofname}{Proof}
+\begin{document}
+\vspace*{.08in}
+\begin{center}
+{\LARGE\bfseries From Rank Displacement to Machine Range Overlap}\par
+\vspace{3pt}
+{\large A coarse-grained analysis of distributed sort-then-search}\par
+\vspace{5pt}
+J. R. Landers\par
+\vspace{7pt}
+{\small 17 October 2026}
+\end{center}
+\textbf{Abstract.} Consider $m$ machines holding $b$ distinct keys each. They sort locally and answer membership queries without necessarily merging their runs. How many machines can a query require when the concatenated data have bounded squared rank-displacement potential? We bound the number of overlapping machine ranges by a cube root of that potential, sharpen the finite bound by pairing distinct crossing ranks with physical positions, and construct instances showing that the exponent is necessary. The elementary cube root comes directly from the identity for a sum of squares. We then remove disorder due only to whole-block relocation: minimizing potential over block orders preserves overlap and yields a stronger, order-invariant guarantee with a simple optimal ordering rule. An exact coarse/fine decomposition, comparison and communication accounting, and a simulation connect the structural bounds to a choice between range routing and a global merge. The interval directory and deferred merge are established techniques; the potential-to-overlap results are working claims without a publication-priority assertion.
+
+\section{Why this problem?}
+Suppose records are spread over machines, and a service must answer questions of the form ``does key $y$ occur, and where?'' A machine can sort its own records, but a global sorted index would require further cross-machine work. If queries are few, it may be better to keep the sorted runs separate and route each query to plausible machines. If many machine ranges overlap at $y$, however, this plan can degenerate into searching nearly every machine.
+
+The question is whether a numerical bound on disorder predicts that overlap. There is an immediate complication: a permutation of whole, internally sorted machines can be very disordered in physical order while their value ranges remain disjoint. We first prove a general guarantee, then remove this harmless source of potential by optimizing the whole-block order. We borrow a coarse-graining viewpoint from renormalization-group (RG) vocabulary: retain the machine-scale features relevant to routing while suppressing individual key positions. This is an interpretation, not an RG-based optimization theorem. Sorted runs and deferred organization are known \cite{barbay}; interval stabbing is a standard reporting problem \cite{akram}. The proposed connection is from rank displacement to the number of machine ranges a point can stab.
+
+This note connects to the disorder-potential search program \cite{landers}, which studies a single search and the cost of preprocessing many searches. Its numerical potential promise must be supplied or certified. Here the machine partition is fixed and equal-sized, all comparisons are charged, and communication is called out separately. We do not assume a free global rank oracle in the algorithm.
+
+\section{Model and exact decompositions}
+Let $n=mb$, with $m\ge1$ and $b\ge2$. The $n$ keys are distinct and totally ordered. In physical machine order, write $A=(A_1,\ldots,A_n)$; let $x_i\in\{1,\ldots,n\}$ be the global rank of $A_i$. The potential is
+\begin{equation}\label{eq:potential}
+ V(A)=\frac12\sum_{i=1}^{n}(x_i-i)^2.
+\end{equation}
+The instance comes with a bound $V(A)\le E$, either as an explicit promise or as a certificate whose verification cost must be counted. Our data structure never computes $V$ or the global ranks. Since swapping an adjacent inverted pair of ranks $u>v$ decreases $V$ by exactly $u-v$, sorting each block locally cannot increase the potential; it also preserves that block's minimum and maximum.
+
+The easiest case has an exact two-level description. Suppose each physical block contains a complete, contiguous interval of $b$ global ranks. Let $\pi(j)$ be the rank interval held at physical block $j$; then $\pi$ is a permutation of $\{1,\ldots,m\}$. If $r_{j,t}$ is the local rank of the key at position $t$ inside block $j$, define $E_j=\frac12\sum_{t=1}^{b}(r_{j,t}-t)^2$. Then:
+\begin{proposition}[Whole-block identity]\label{prop:block}
+ Under the contiguous-rank-interval assumption,
+ \begin{equation}\label{eq:block}
+ V(A)=\sum_{j=1}^{m}E_j+b^3V(\pi),\qquad
+ V(\pi)=\frac12\sum_{j=1}^{m}(\pi(j)-j)^2.
+ \end{equation}
+\end{proposition}
+\begin{proof}
+At position $(j-1)b+t$, the displacement is $b(\pi(j)-j)+(r_{j,t}-t)$. Square and sum within block $j$. The cross term vanishes because $\sum_t(r_{j,t}-t)=0$ for a local permutation. The remaining terms are $E_j$ and $b^3(\pi(j)-j)^2/2$.
+\end{proof}
+
+Interleaved ranges need not admit any $\pi$. There is nevertheless an exact decomposition that keeps the coarse/fine analogy honest. Put
+\[
+ x_{j,t}=x_{(j-1)b+t},\quad
+ \mu_j=\frac1b\sum_{t=1}^{b}x_{j,t},\quad
+ c_j=(j-1)b+\frac{b+1}{2},\quad
+ z_t=t-\frac{b+1}{2}.
+\]
+\begin{proposition}[Block-mean decomposition]\label{prop:anova}
+ For arbitrary interleaving,
+ \begin{equation}\label{eq:anova}
+ V(A)=\underbrace{\frac b2\sum_{j=1}^{m}(\mu_j-c_j)^2}_{V_{\mathrm{coarse}}}
+ +\underbrace{\frac12\sum_{j=1}^{m}\sum_{t=1}^{b}
+ \bigl[(x_{j,t}-\mu_j)-z_t\bigr]^2}_{V_{\mathrm{residual}}}.
+ \end{equation}
+ In the contiguous-rank case, this is exactly (\ref{eq:block}).
+\end{proposition}
+\begin{proof}
+The displacement at $(j-1)b+t$ equals $(\mu_j-c_j)+[(x_{j,t}-\mu_j)-z_t]$. The bracketed residuals sum to zero within block $j$, so their cross term with $\mu_j-c_j$ vanishes. In the restricted case, $\mu_j-c_j=b(\pi(j)-j)$ and the residual is $r_{j,t}-t$.
+\end{proof}
+The means $\mu_j$ require global ranks and are analytical coordinates, not free directory fields. Moreover, local sorting does not generally make $V_{\mathrm{residual}}$ vanish: an internally sorted block may contain interleaved global ranks. For routing, the observable coarse state will instead be the family of value intervals.
+
+\section{The interval router and what it costs}
+Each machine sorts its $b$ keys and can retain an original-position tag with every key. Define its closed value range $I_j=[\min A_j,\max A_j]$. Build a static centered interval tree over $I_1,\ldots,I_m$. For a query $y$, report all $k(y)=|\{j:y\in I_j\}|$ matching ranges and binary-search those machines. A range that excludes $y$ cannot contain the key; therefore the algorithm is exact. It returns a machine and local position for a present key and reports absence after exhausting the candidates.
+
+In the comparison model, a suitable static interval tree uses $O(m\log m)$ directory-building comparisons, $O(m)$ extra words, and $O(\log m+k)$ comparisons to report $k$ intervals. Local sorting takes $O(mb\log b)$ comparisons in total; searching each candidate takes $O(\log b)$. Thus one query costs
+\begin{equation}\label{eq:query}
+ C(y)=O\bigl(\log m+k(y)\log b\bigr),
+\end{equation}
+and $q$ queries cost
+\begin{equation}\label{eq:batch}
+ O\left(mb\log b+m\log m+q\log m+\log b\sum_{a=1}^{q}k(y_a)\right).
+\end{equation}
+This is a total comparison count. If local sorts run concurrently, their wall time differs; contacting $k$ machines also incurs communication and latency, which (\ref{eq:query}) does not hide. A full merge of the local runs is a valid alternative baseline with its own charged construction cost, often $O(mb\log m)$ comparisons after local sorting and $O(\log(mb))$ per membership query. The best choice depends on query volume and machine costs.
+
+\section{Potential limits interval overlap}
+Fix an absent target $y$ and put $r=|\{a\in A:a<y\}|$. The rank cut is the gap between ranks $r$ and $r+1$. Call a candidate block \emph{left} if all its physical positions are at most $r$, and \emph{right} if all its positions exceed $r$. There are $L$ and $R$ such candidates; at most one physical block straddles position $r$. Every candidate range containing an absent $y$ contains both a key below and a key above $y$. A left candidate therefore holds a key of rank $>r$, and a right candidate holds one of rank $\le r$.
+
+\begin{theorem}[Elementary cubic bound]\label{thm:cubic}
+ If $V(A)\le E$, then for every absent $y$,
+ \begin{equation}\label{eq:cubic}
+ k(y)\le 3+\left(\frac{24E}{b^2}\right)^{1/3}.
+ \end{equation}
+ For a present $y$, the right side increases by at most one.
+\end{theorem}
+\begin{proof}
+Number left candidate blocks from nearest the physical cut outwards. Select one key above rank $r$ from each. These keys occupy distinct blocks and have displacement at least $1,b+1,\ldots,(L-1)b+1$. On the right, one low-rank key per candidate has analogous displacements. Consequently
+\begin{equation}\label{eq:weak}
+2E\ge b^2\left(\sum_{t=0}^{L-1}t^2+\sum_{t=0}^{R-1}t^2\right).
+\end{equation}
+Using $\sum_{t=0}^{q-1}t^2\ge(q-1)_+^3/3$, $a^3+c^3\ge(a+c)^3/4$ for $a,c\ge0$, and $(L-1)_++(R-1)_+\ge(k-3)_+$ gives $E\ge b^2(k-3)_+^3/24$. For a present key, use the gap immediately before it: all candidate ranges except possibly its own also contain that gap.
+\end{proof}
+This says that an absent query cannot be routed to many machines without paying cubic displacement energy. The coefficient is conservative: (\ref{eq:weak}) treats several crossing keys as if each could use the same closest available rank. They cannot. The next theorem uses their distinct ranks.
+
+\paragraph{Why a cube root?} The elementary identity
+\begin{equation}\label{eq:squares}
+ \sum_{t=0}^{q-1}t^2=\frac{(q-1)q(2q-1)}6=\frac{q^3}{3}+O(q^2)
+\end{equation}
+is the source of the exponent. As candidate blocks extend away from the rank cut, their required key displacements grow in steps of about $b$. Squaring each displacement and adding across $q$ blocks costs order $b^2q^3$. Inverting $E\gtrsim b^2q^3$ gives $q\lesssim(E/b^2)^{1/3}$. The proof above accounts for both sides of the cut and the possible block that straddles it; those details produce the additive $3$ and the safe constant $24$. The cube root is a property of cumulative squared costs, not of RG terminology.
+
+\section{A universal paired-crossing refinement}
+For integers $q\ge0$, define
+\begin{equation}\label{eq:F}
+F_b(q)=\sum_{t=0}^{q-1}\bigl[q+(b-1)t\bigr]^2
+=q^3+(b-1)q^2(q-1)+\frac{(b-1)^2q(q-1)(2q-1)}6.
+\end{equation}
+Take $F_b(0)=0$. The physical cut can lie inside one block. We keep the possible straddler separate rather than assuming the cut happens to align with a machine boundary.
+\begin{theorem}[Distinct crossing ranks]\label{thm:paired}
+ For every absent $y$ with $L$ left and $R$ right candidate blocks,
+ \begin{equation}\label{eq:paired}
+ 2E\ge F_b(L)+F_b(R).
+ \end{equation}
+ In terms of $k=k(y)$ alone, set $s=(k-1)_+$. Then
+ \begin{equation}\label{eq:universal}
+ E\ge \frac12\left[F_b\!\left(\left\lfloor\frac{s}{2}\right\rfloor\right)
+ +F_b\!\left(\left\lceil\frac{s}{2}\right\rceil\right)\right].
+ \end{equation}
+ If $r$ is a physical block boundary, replace $s$ by $k$. The same formulas apply with $E$ replaced by the actual $V(A)$.
+\end{theorem}
+\begin{proof}
+Choose one above-cut key from each left candidate, and list their physical positions from nearest the cut to farthest as $p_0>\cdots>p_{L-1}$. Since the selected blocks are distinct and have width $b$, $p_t\le r-tb$. Their ranks are $L$ \emph{distinct} integers above $r$. Among all possible assignments, the sum of squared displacements is smallest if we use the $L$ closest above-cut ranks and match positions and ranks in the same sorted order (the rearrangement inequality for squared distance). The nearest physical position then receives rank at least $r+L$, the next at least $r+L-1$, and so on. The selected left keys therefore contribute at least $F_b(L)$ to $2V(A)$. Applying the symmetric argument to $R$ right candidates gives $F_b(R)$; all selected keys are distinct. This proves (\ref{eq:paired}).
+
+At most one candidate block straddles the physical cut, so $L+R\ge s$. The function $F_b$ is increasing and discretely convex for $b\ge2$. Its sum at a fixed $L+R$ is minimized when $L$ and $R$ differ by at most one, giving (\ref{eq:universal}). At a block boundary there is no straddling block and $L+R=k$.
+\end{proof}
+The refinement is explicit and integer-valued. For fixed $b$ and growing $q$,
+\begin{equation}\label{eq:asymptotic}
+ F_b(q)=\frac{b^2+b+1}{3}q^3+O(b^2q^2).
+\end{equation}
+Thus the universal bound retains the cube-root exponent while improving the finite-instance threshold and the leading constant of this particular lower bound. It does \emph{not} establish the exact minimum possible $E$ for a given $k$. When $y$ is present, delete its unique containing block from the count and apply the absent-gap reasoning; this gives a valid bound with at most one additional candidate.
+
+\section{How tight, and what the simulation shows}
+The cubic exponent is unavoidable. Start with $2h$ sorted blocks of size $b$. For $t=0,\ldots,h-1$, swap the last key of the left block ending at position $(h-t)b$ with the first key of the right block beginning at position $(h+t)b+1$. The blocks remain internally sorted. For the absent central query $y=hb+\tfrac12$, every one of the $2h$ block ranges contains $y$, while
+\begin{equation}\label{eq:construction}
+k(y)=2h,\qquad V(A)=\sum_{t=0}^{h-1}(2tb+1)^2=\Theta(b^2h^3).
+\end{equation}
+Hence no bound depending only on $E,b$ can replace the cube root by a smaller exponent. This family is a witness to scaling, not to an optimal constant. For $b=2$ and four blocks, nearest-pair swaps give $k=4$ and $V=26$, whereas
+\[
+ [1,5]\mid[2,6]\mid[3,7]\mid[4,8]
+\]
+also has four ranges containing $y=4.5$ but only $V=14$. The aligned-cut paired bound gives $E\ge F_2(2)=13$; the second configuration comes close without proving attainability of $13$.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=.96\linewidth]{potential-bound-full-plot.png}
+\caption{Absent central-gap queries on $m=128$ machines of $b=16$ keys. Each of 600 random runs selects a nonempty random subset of the 32 symmetric boundary-key exchanges; the orange family takes the $h$ nearest exchanges for $h=1,\ldots,32$. Dots are actual $k$ against actual $V/b^2$. The solid line is the integer upper envelope obtained by inverting (\ref{eq:universal}); the dashed line is (\ref{eq:cubic}). The experiment samples this restricted exchange family and is a check of the inequalities, not evidence of typical behavior for arbitrary permutations.}\label{fig:sim}
+\end{figure}
+
+The plot separates three claims. Both lines are worst-case ceilings under their respective proven inequalities. The orange construction tracks the necessary exponent. The random exchange runs tend to visit fewer machines at a fixed energy because distant exchanges spend disorder without introducing many new candidate ranges. In the generated sample all 600 observations satisfy both bounds; exhaustive small-instance checks are useful verification but do not replace the proofs.
+
+\paragraph{A worked cut.} Consider $128$ machines of $16$ keys and apply the nearest-pair construction with $h=4$ at the central gap. Exactly eight machine ranges meet the absent target. The potential is
+\[
+E=1^2+33^2+65^2+97^2=14{,}724.
+\]
+The elementary bound (\ref{eq:cubic}) allows at most $14$ candidates after taking the integer part. The paired inequality (\ref{eq:universal}) allows at most $12$ without using the cut position, and at most $11$ with the known fact that this cut lies between two blocks. The actual count is eight. These numbers illustrate a rigorous reduction of the worst-case ceiling, not a guarantee that a query will use all allowed candidates. In a distributed implementation, eight candidate blocks still mean up to eight machine contacts. The choice between this routing method and a globally merged index therefore depends on network latency as well as comparison count.
+
+\section{Removing harmless block relocation}
+A large $V$ does not force substantial overlap. Sort each block internally, but reverse the order of the $m$ complete rank intervals across physical machines. Their value ranges remain disjoint, so any target lies in at most one range. Yet (\ref{eq:block}) gives
+\[
+ V(A)=b^3V(\pi)=\frac{b^3m(m^2-1)}6
+\]
+for the reversal permutation $\pi(j)=m+1-j$. This potential measures displacement relative to an arbitrary order of machines that the range directory need not respect.
+
+Let $r_{j,1}<\cdots<r_{j,b}$ be the global ranks in block $j$ after local sorting. For a block permutation $\sigma$, place block $j$ in slot $\sigma(j)$, and define the \emph{order-invariant mixing potential}
+\begin{equation}\label{eq:mixdef}
+ E_{\rm mix}=\min_{\sigma\in S_m}\frac12\sum_{j=1}^{m}\sum_{t=1}^{b}
+ \bigl[r_{j,t}-((\sigma(j)-1)b+t)\bigr]^2.
+\end{equation}
+This operation changes only physical block order: the set of block ranges and $k(y)$ remain exactly the same. The global ranks in (\ref{eq:mixdef}) are analytical information, not free fields of the router.
+
+\begin{theorem}[Order-invariant overlap certificate]\label{thm:mix}
+ Write $\mu_j=b^{-1}\sum_t r_{j,t}$, $z_t=t-(b+1)/2$, $c_s=(s-1)b+(b+1)/2$, and let $\mu_{(1)}\le\cdots\le\mu_{(m)}$ be the sorted block means. Then
+ \begin{equation}\label{eq:mixformula}
+ E_{\rm mix}=\frac12\sum_{j,t}\bigl[(r_{j,t}-\mu_j)-z_t\bigr]^2
+ +\frac b2\sum_{s=1}^{m}(\mu_{(s)}-c_s)^2.
+ \end{equation}
+ In particular, sorting whole blocks by mean global rank minimizes potential. For every absent target $y$,
+ \begin{equation}\label{eq:mixbound}
+ k(y)\le 3+\left(\frac{24E_{\rm mix}}{b^2}\right)^{1/3}.
+ \end{equation}
+ The paired-crossing bound (\ref{eq:universal}) also holds with $E_{\rm mix}$ in place of $E$.
+\end{theorem}
+\begin{proof}
+Apply the block-mean decomposition (\ref{eq:anova}) after local sorting and block permutation. The first sum in (\ref{eq:mixformula}) is independent of $\sigma$. For any two block means $u\le v$ and positions $c_s\le c_t$, matching them in the same order costs no more than crossing them: the crossed cost minus the ordered cost is $b(v-u)(c_t-c_s)\ge0$. Repeated uncrossing proves (\ref{eq:mixformula}). Reordering blocks preserves every value interval and hence $k(y)$. Apply Theorem~\ref{thm:cubic} and then Theorem~\ref{thm:paired} to a minimizing order. The count-only paired inequality is independent of where the candidate blocks lie in that order.
+\end{proof}
+
+Since local sorting cannot increase $V$, $E_{\rm mix}\le V(A)$. It is zero for any permutation of complete, internally sorted rank blocks, including the reversal above. It can still include displacement irrelevant to a \emph{particular} query; a cut-specific energy might give a sharper local certificate. For fixed $b$ and growing $h$, the construction in (\ref{eq:construction}) has $E_{\rm mix}=\Theta(b^2k^3)$: Theorem~\ref{thm:mix} gives the lower scaling, while the construction's original potential gives an upper bound on the minimum. Thus removing whole-block relocation improves the budget without changing the universal cube-root exponent.
+
+\section{When the certificate changes a decision}
+The router's comparison cost for $q$ queries is (\ref{eq:batch}), while a full merge after local sorting costs roughly $O(mb\log m)$ comparisons up front and $O(\log(mb))$ per query. With an externally supplied or certified $E_{\rm mix}$, (\ref{eq:mixbound}) gives a pre-query upper bound on candidate-machine contacts; for present keys allow one extra candidate. This can justify keeping the runs separate when a merger would not be repaid by the anticipated queries. It does not mean the router has computed global ranks.
+
+After local sorting, each machine can report its minimum and maximum. Their range directory reports the \emph{actual} $k(y)$, and a sweep of endpoints can find the maximum overlap without global ranks. For a workload, measured average overlap and machine latency are more useful than a conservative potential ceiling. In a calibrated model, let $C_R$ be the measured cost of a routed query, $C_M$ the cost of a query after merging, $C_{\rm merge}$ the remaining merge cost, and $q_{\rm rem}$ the expected number of remaining queries. Merge when
+\begin{equation}\label{eq:decision}
+ q_{\rm rem}(C_R-C_M)>C_{\rm merge},\qquad C_R>C_M,
+\end{equation}
+with communication included in the respective measured query costs. If the range directory has not yet been built, add its construction cost to the router side. The inequality is an engineering rule under a workload estimate, not an asymptotic theorem. Computing the exact $E_{\rm mix}$ from raw keys requires global rank information and may cost more than the decision is worth. The bound is most useful when its budget is a meaningful upstream promise or certificate.
+
+\section{Interpretation and open questions}
+The mean/residual identity (\ref{eq:anova}) separates block-scale displacement from within-block structure. The router uses a different coarse state, the block extrema. Theorems \ref{thm:cubic}, \ref{thm:paired}, and \ref{thm:mix} connect these descriptions by limiting overlap from rank displacement, even after harmless block relocations are removed. This is a coarse-graining analogy, not an iterative renormalization flow. Interval trees, deferred organization, and processing separate sorted runs are established \cite{akram,barbay,albutiu}; the potential-to-overlap certificates are the proposed working results. We have not established publication novelty, an exact extremal constant, or optimality of the full preprocessing/query trade-off.
+
+Next questions are (i) find the exact minimum $E_{\rm mix}$ for a specified overlap profile and cut, perhaps with a query-specific certificate; (ii) allow unequal block sizes and repeated keys with a careful tie convention; (iii) measure the communication and break-even costs against a global merge; and (iv) seek a genuinely multilevel directory whose potential guarantee composes across levels. Any advertised potential promise must account for how it was obtained.
+
+\begin{thebibliography}{9}\small
+\bibitem{landers} J. R. Landers, \emph{Disorder Potential and the Cost of Search} and \emph{Search Under a Disorder Budget}, project manuscripts and repository, 2026. \url{https://github.com/jonland82/algorithmic-search-cost}.
+\bibitem{barbay} J. Barbay, C. Ochoa, and S. R. Satti, ``Synergistic Sorting, MultiSelection and Deferred Data Structures on MultiSets,'' arXiv:1608.06666, 2016. \url{https://arxiv.org/abs/1608.06666}.
+\bibitem{akram} W. Akram and S. Saxena, ``Top-k Stabbing Interval Queries,'' arXiv:2411.03037, 2024. \url{https://arxiv.org/abs/2411.03037}.
+\bibitem{albutiu} M.-C. Albutiu, A. Kemper, and T. Neumann, ``Massively Parallel Sort-Merge Joins in Main Memory Multi-Core Database Systems,'' arXiv:1207.0145, 2012. \url{https://arxiv.org/abs/1207.0145}.
+\end{thebibliography}
+\end{document}

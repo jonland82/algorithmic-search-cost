@@ -35,7 +35,7 @@ PAPERS = (
         "A balance law and a separation by disorder location",
         "October 4, 2026",
         "The full mobile-friendly HTML edition of Disorder Potential and the Cost of Search.",
-        "paper 01 / 02",
+        "paper 01 / 03",
     ),
     Paper(
         "experiments/n9-potential-distribution/potential_across_random_permutations.tex",
@@ -53,11 +53,20 @@ PAPERS = (
         "Preprocessing, repeated queries, and adaptive indexing",
         "October 9, 2026",
         "The full mobile-friendly HTML edition of Search Under a Disorder Budget.",
-        "paper 02 / 02",
+        "paper 02 / 03",
+    ),
+    Paper(
+        "search-disorder-and-interleaving/rank-disorder-routing-full-note.tex",
+        "03",
+        "From Rank Displacement to Machine Range Overlap",
+        "A coarse-grained analysis of distributed sort-then-search",
+        "October 17, 2026",
+        "A full HTML edition on rank displacement and overlapping machine ranges in distributed search.",
+        "paper 03 / 03",
     ),
     Paper(
         "search-under-query-entropy/search_under_query_entropy.tex",
-        "03",
+        "W",
         "Search Under Disorder and Query Entropy",
         "A two-budget note on repeated comparison search",
         "October 8, 2026",
@@ -109,12 +118,11 @@ def convert_body(paper: Paper) -> tuple[str, str]:
         raise ValueError(f"Missing title block: {source_path}")
     title_block.decompose()
 
-    main_paper = paper.number == "01"
     for heading in soup.find_all(["h1", "h4"]):
-        if main_paper:
-            heading.name = "h2" if heading.name == "h1" else "h3"
-        else:
+        if heading.name == "h1":
             heading.name = "h2"
+        else:
+            heading.name = "h3" if paper.number in {"01", "03"} else "h2"
 
     first_paragraph = soup.find("p")
     if first_paragraph and first_paragraph.strong and first_paragraph.strong.get_text(strip=True) == "Abstract.":
@@ -147,11 +155,28 @@ def convert_body(paper: Paper) -> tuple[str, str]:
             seen_labels.add(label)
     if seen_labels != set(labels):
         raise ValueError(f"Equation anchors missing in {source_path}: {set(labels) - seen_labels}")
-    for link in soup.select('a[data-reference-type="eqref"]'):
+    for link in soup.select('a[data-reference-type="eqref"], a[data-reference-type="ref"]'):
         label = link.get("data-reference")
+        if not label:
+            continue
+        if label.startswith("thm:") and paper.number == "03":
+            # Pandoc includes "Theorem" in the link, while the prose already supplies it.
+            link.string = link.get_text(" ", strip=True).split()[-1]
+            continue
+        if not label.startswith("eq:"):
+            continue
         if label not in equation_numbers:
             raise ValueError(f"Unresolved equation reference in {source_path}: {label}")
-        link.string = f"({equation_numbers[label]})"
+        number = str(equation_numbers[label])
+        link.string = f"({number})" if link.get("data-reference-type") == "eqref" else number
+
+    if paper.number == "03":
+        for figure in soup.find_all("figure"):
+            image = figure.find("img")
+            caption = figure.find("figcaption")
+            if image and caption:
+                image["alt"] = "Plot of machine-range overlap against rank-displacement potential"
+                caption.attrs.pop("aria-hidden", None)
 
     for table in soup.find_all("table"):
         headers = [heading.get_text(" ", strip=True) for heading in table.select("thead th")]
